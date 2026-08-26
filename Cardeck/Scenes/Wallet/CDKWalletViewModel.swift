@@ -15,6 +15,11 @@ public final class CDKWalletViewModel {
     public var onChange: (() -> Void)?
     /// Вызывается, когда карта удалена и доступна отмена в течение окна ожидания.
     public var onUndoAvailable: ((CDKCardSnapshot) -> Void)?
+    /// Вызывается, когда запись в хранилище не удалась.
+    ///
+    /// Чаще всего это переполненный диск. Молча проглатывать такое нельзя:
+    /// пользователь считает, что порядок карт сохранён, а он не сохранён.
+    public var onWriteFailure: (() -> Void)?
 
     private let store: CDKCardStore
     private let preferences: CDKPreferencesProtocol
@@ -68,12 +73,22 @@ public final class CDKWalletViewModel {
     /// правилом сортировки, и перестановка была бы потеряна при следующем чтении.
     public func move(from source: Int, to destination: Int) {
         guard isReorderingEnabled else { return }
-        try? store.reorder(from: source, to: destination)
+        perform { try store.reorder(from: source, to: destination) }
         reload()
+    }
+
+    /// Выполняет запись и сообщает наверх, если она не удалась.
+    private func perform(_ work: () throws -> Void) {
+        do {
+            try work()
+        } catch {
+            onWriteFailure?()
+        }
     }
 
     /// Отмечает карту открытой — влияет на сортировку по частоте.
     public func markUsed(id: UUID) {
+        // Отметку об использовании терять не жалко: она влияет только на сортировку.
         try? store.touch(cardID: id)
     }
 
@@ -104,7 +119,7 @@ public final class CDKWalletViewModel {
     public func commitPendingDeletion() {
         guard let card = pendingDeletion else { return }
         pendingDeletion = nil
-        try? store.delete(id: card.id)
+        perform { try store.delete(id: card.id) }
         reload()
     }
 }

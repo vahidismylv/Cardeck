@@ -20,6 +20,7 @@ public final class CDKCardMaterialView: UIView, CDKMotionObserver {
 
     private var isObservingMotion = false
 
+    private var gradient: CDKGradientPreset
     private var cornerRadiusLink: CADisplayLink?
     private var cornerRadiusStart: CGFloat = 0
     private var cornerRadiusTarget: CGFloat = 0
@@ -48,6 +49,7 @@ public final class CDKCardMaterialView: UIView, CDKMotionObserver {
         motionService: CDKMotionServiceProtocol = CDKMotionService.shared
     ) {
         self.motionService = motionService
+        self.gradient = gradient
         let flat = UIAccessibility.isDarkerSystemColorsEnabled
         if preferences.holographicEnabled, let renderer = CDKMetalCardRenderer.shared {
             metalSurface = CDKMetalCardSurface(renderer: renderer, gradient: gradient, flat: flat)
@@ -62,6 +64,18 @@ public final class CDKCardMaterialView: UIView, CDKMotionObserver {
         let surface: UIView = metalSurface ?? fallbackSurface!
         cdkAddSubview(surface)
         surface.cdkPin(to: self)
+        // Increase Contrast можно включить, не выходя из приложения: без подписки
+        // карты остались бы градиентными до пересоздания ячейки.
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleContrastChange),
+            name: UIAccessibility.darkerSystemColorsStatusDidChangeNotification,
+            object: nil
+        )
+    }
+
+    @objc private func handleContrastChange() {
+        update(gradient: gradient)
     }
 
     @available(*, unavailable)
@@ -74,6 +88,7 @@ public final class CDKCardMaterialView: UIView, CDKMotionObserver {
 
     /// Меняет градиент карты — вызывается при переиспользовании ячейки.
     public func update(gradient: CDKGradientPreset) {
+        self.gradient = gradient
         let flat = UIAccessibility.isDarkerSystemColorsEnabled
         metalSurface?.update(gradient: gradient, flat: flat)
         fallbackSurface?.update(gradient: gradient, flat: flat)

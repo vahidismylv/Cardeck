@@ -56,7 +56,12 @@ public final class CDKCardStackLayout: UICollectionViewLayout {
     // MARK: - Геометрия
 
     private var horizontalInset: CGFloat { CDKTheme.Card.stackHorizontalInset }
-    private var step: CGFloat { CDKTheme.Card.stackStep }
+    /// Видимая полоса карты растёт вместе с Dynamic Type: при крупных размерах
+    /// название с категорией в исходные 62 pt просто не помещаются.
+    private var step: CGFloat {
+        let metrics = UIFontMetrics(forTextStyle: .title2)
+        return min(metrics.scaledValue(for: CDKTheme.Card.stackStep), CDKTheme.Card.stackStep * 2)
+    }
     private var pinnedStep: CGFloat { CDKTheme.Card.pinnedStep }
 
     /// Высота аккордеона из прижатых карт.

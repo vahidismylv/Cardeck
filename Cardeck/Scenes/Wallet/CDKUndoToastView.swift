@@ -5,11 +5,11 @@
 
 import UIKit
 
-/// Тост «карта удалена» с возможностью отменить действие.
+/// Всплывающее сообщение внизу экрана с необязательным действием.
 ///
-/// Карта исчезает из стопки сразу, но из хранилища уходит только по истечении
-/// окна отмены: удаление должно ощущаться мгновенным и при этом оставаться
-/// обратимым.
+/// Основной сценарий — «карта удалена / отменить»: карта исчезает из стопки
+/// сразу, но из хранилища уходит только по истечении окна отмены. Тот же тост
+/// без действия сообщает об ошибке записи.
 public final class CDKUndoToastView: UIView {
 
     /// Сколько времени висит тост.
@@ -24,8 +24,18 @@ public final class CDKUndoToastView: UIView {
     private let undoButton = UIButton(type: .system)
     private var timer: Timer?
 
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
+    private let message: String
+    private let actionTitle: String?
+
+    /// Создаёт тост.
+    ///
+    /// - Parameters:
+    ///   - message: текст сообщения.
+    ///   - actionTitle: подпись действия; `nil` — тост без кнопки.
+    public init(message: String = "Card deleted", actionTitle: String? = "Undo") {
+        self.message = message
+        self.actionTitle = actionTitle
+        super.init(frame: .zero)
         setUp()
     }
 
@@ -95,19 +105,20 @@ public final class CDKUndoToastView: UIView {
         layer.cornerRadius = CDKTheme.Radius.surface
         layer.cornerCurve = .continuous
 
-        titleLabel.text = "Card deleted"
+        titleLabel.text = message
         titleLabel.font = CDKTheme.Font.callout
         titleLabel.textColor = CDKTheme.Color.textPrimary
         titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.numberOfLines = 0
 
         var configuration = UIButton.Configuration.plain()
-        configuration.title = "Undo"
+        configuration.title = actionTitle ?? ""
         configuration.baseForegroundColor = CDKTheme.Color.accent
         configuration.contentInsets = .zero
         undoButton.configuration = configuration
         undoButton.titleLabel?.adjustsFontForContentSizeCategory = true
         undoButton.setContentHuggingPriority(.required, for: .horizontal)
+        undoButton.isHidden = actionTitle == nil
         undoButton.addAction(
             UIAction { [weak self] _ in self?.dismiss(undo: true) },
             for: .touchUpInside

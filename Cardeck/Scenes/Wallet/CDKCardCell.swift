@@ -35,6 +35,7 @@ public final class CDKCardCell: UICollectionViewCell {
     private let categoryIcon = UIImageView()
 
     private var snapshot: CDKCardSnapshot?
+    private var categoryStack: UIStackView?
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -80,7 +81,14 @@ public final class CDKCardCell: UICollectionViewCell {
         categoryIcon.image = UIImage(systemName: card.category.symbolName)
         categoryIcon.tintColor = foreground.withAlphaComponent(0.75)
 
+        updateCategoryVisibility()
         configureAccessibility(with: card)
+    }
+
+    /// Прячет категорию, когда шрифт крупный: иначе подпись обрезает соседняя карта.
+    private func updateCategoryVisibility() {
+        categoryStack?.isHidden = traitCollection.preferredContentSizeCategory
+            .isAccessibilityCategory
     }
 
     /// Возвращает материал ячейке после завершения перехода.
@@ -142,6 +150,12 @@ public final class CDKCardCell: UICollectionViewCell {
         let categoryStack = UIStackView(arrangedSubviews: [categoryIcon, categoryLabel])
         categoryStack.spacing = CDKTheme.Spacing.xs
         categoryStack.alignment = .center
+        self.categoryStack = categoryStack
+
+        // На accessibility-размерах в видимую полосу карты влезает только название.
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) {
+            (cell: CDKCardCell, _) in cell.updateCategoryVisibility()
+        }
 
         contentView.cdkAddSubview(titleLabel)
         contentView.cdkAddSubview(codeLabel)

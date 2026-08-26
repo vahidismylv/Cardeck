@@ -141,6 +141,17 @@ public final class CDKWalletViewController: UIViewController {
     private func bind() {
         viewModel.onChange = { [weak self] in self?.applySnapshot() }
         viewModel.onUndoAvailable = { [weak self] _ in self?.presentUndoToast() }
+        viewModel.onWriteFailure = { [weak self] in
+            guard let self else { return }
+            self.undoToast?.dismiss(undo: false)
+            let toast = CDKUndoToastView(
+                message: "Could not save. Check free space on your device.",
+                actionTitle: nil
+            )
+            self.undoToast = toast
+            toast.onExpire = { [weak self] in self?.undoToast = nil }
+            toast.present(in: self.view, above: self.view.safeAreaLayoutGuide)
+        }
     }
 
     /// Показывает тост отмены; по истечении окна удаление становится необратимым.

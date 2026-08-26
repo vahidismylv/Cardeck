@@ -24,6 +24,8 @@ public final class CDKAppCoordinator {
     private var walletViewController: CDKWalletViewController?
     /// Контроллер перехода живёт столько же, сколько открытый детальный экран.
     private var cardTransition: CDKCardTransitionController?
+    /// Карта, открытая прямо сейчас, — она и попадает в состояние сцены.
+    private var openCardID: UUID?
 
     /// Создаёт координатор для окна сцены.
     public init(
@@ -64,6 +66,20 @@ public final class CDKAppCoordinator {
         presenter.present(form, animated: true)
     }
 
+    /// Активность для восстановления сцены после убийства приложения.
+    public var restorationActivity: NSUserActivity? {
+        openCardID.map(CDKUserActivity.openCard)
+    }
+
+    /// Восстанавливает открытую карту, если она ещё существует.
+    public func restore(from activity: NSUserActivity?) {
+        guard let id = CDKUserActivity.cardID(from: activity),
+              let wallet = walletViewController,
+              let card = wallet.model.cards.first(where: { $0.id == id }),
+              let cell = wallet.cell(for: card) else { return }
+        wallet.open(card, from: cell)
+    }
+
     /// Показывает стартовый экран.
     public func start() {
         seedDemoDataIfNeeded()
@@ -98,6 +114,7 @@ extension CDKAppCoordinator: CDKWalletViewControllerDelegate {
         detail.transitioningDelegate = transition
         transition.attach(to: detail)
         cardTransition = transition
+        openCardID = card.id
 
         controller.present(detail, animated: true)
     }
@@ -134,6 +151,7 @@ extension CDKAppCoordinator: CDKCardDetailViewControllerDelegate {
     }
 
     public func cardDetailDidDismiss(_ controller: CDKCardDetailViewController) {
+        openCardID = nil
         walletViewController?.resetNeighbours()
         walletViewController?.model.reload()
         cardTransition = nil

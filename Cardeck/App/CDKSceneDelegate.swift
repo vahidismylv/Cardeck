@@ -28,5 +28,17 @@ public final class CDKSceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = window
         self.coordinator = coordinator
         window.makeKeyAndVisible()
+
+        // Карта, открытая до убийства приложения, возвращается на экран.
+        // Стопка к этому моменту уже наполнена, поэтому ячейка-источник найдётся
+        // и переход отработает штатно.
+        let activity = connectionOptions.userActivities.first
+            ?? session.stateRestorationActivity
+        window.layoutIfNeeded()
+        coordinator.restore(from: activity)
+    }
+
+    public func stateRestorationActivity(for scene: UIScene) -> NSUserActivity? {
+        coordinator?.restorationActivity
     }
 }
