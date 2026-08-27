@@ -1,42 +1,25 @@
-//
-//  CDKAddEditViewModel.swift
-//  Cardeck
-//
-
 import Foundation
 
-/// Вью-модель формы добавления и редактирования карты.
-///
-/// Держит черновик карты и правила валидации. Про UIKit не знает: наружу отдаёт
-/// готовый ``CDKCardSnapshot`` для превью и тексты ошибок.
 public final class CDKAddEditViewModel {
 
-    /// Режим работы формы.
     public enum Mode {
-        /// Новая карта.
+
         case create
-        /// Редактирование существующей.
+
         case edit(CDKCardSnapshot)
     }
 
-    /// Предельные длины полей.
     public enum Limit {
         public static let title = 30
         public static let note = 140
         public static let code = 64
     }
 
-    /// Вызывается после каждого изменения черновика.
     public var onChange: (() -> Void)?
 
     private let mode: Mode
     private let store: CDKCardStore
     private let original: CDKCardSnapshot
-
-    // Свойства вычисляемые поверх приватного хранилища, и запись в них никогда
-    // не идёт через `inout`. Иначе эксклюзивный доступ остаётся открытым на всё
-    // время вызова, а `onChange` внутри читает то же самое хранилище — Swift
-    // ловит это как одновременный доступ и роняет приложение на первом же символе.
 
     private var titleStorage = ""
     private var codeStorage = ""
@@ -45,7 +28,6 @@ public final class CDKAddEditViewModel {
     private var categoryStorage: CDKCategory = .other
     private var gradientIndexStorage = 0
 
-    /// Название карты; длина ограничена ``Limit/title``.
     public var title: String {
         get { titleStorage }
         set {
@@ -56,7 +38,6 @@ public final class CDKAddEditViewModel {
         }
     }
 
-    /// Номер карты; длина ограничена ``Limit/code``.
     public var code: String {
         get { codeStorage }
         set {
@@ -67,7 +48,6 @@ public final class CDKAddEditViewModel {
         }
     }
 
-    /// Заметка; длина ограничена ``Limit/note``.
     public var note: String {
         get { noteStorage }
         set {
@@ -78,7 +58,6 @@ public final class CDKAddEditViewModel {
         }
     }
 
-    /// Тип кода.
     public var codeType: CDKCodeType {
         get { codeTypeStorage }
         set {
@@ -88,7 +67,6 @@ public final class CDKAddEditViewModel {
         }
     }
 
-    /// Категория.
     public var category: CDKCategory {
         get { categoryStorage }
         set {
@@ -98,7 +76,6 @@ public final class CDKAddEditViewModel {
         }
     }
 
-    /// Индекс градиента в палитре.
     public var gradientIndex: Int {
         get { gradientIndexStorage }
         set {
@@ -108,7 +85,6 @@ public final class CDKAddEditViewModel {
         }
     }
 
-    /// Создаёт вью-модель формы.
     public init(mode: Mode, store: CDKCardStore) {
         self.mode = mode
         self.store = store
@@ -130,21 +106,16 @@ public final class CDKAddEditViewModel {
         gradientIndexStorage = original.gradientIndex
     }
 
-    // MARK: - Представление
-
-    /// Заголовок экрана.
     public var screenTitle: String {
         if case .edit = mode { return "Edit card" }
         return "New card"
     }
 
-    /// Подпись кнопки сохранения.
     public var saveTitle: String {
         if case .edit = mode { return "Save" }
         return "Add card"
     }
 
-    /// Черновик карты для живого превью.
     public var draft: CDKCardSnapshot {
         original.replacing(
             title: title.isEmpty ? "Card name" : title,
@@ -156,19 +127,12 @@ public final class CDKAddEditViewModel {
         )
     }
 
-    // MARK: - Валидация
-
-    /// Ошибка поля названия, если она есть.
     public var titleError: String? {
         title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             ? "Name is required"
             : nil
     }
 
-    /// Ошибка поля номера, если она есть.
-    ///
-    /// Несовместимые с Code 128 символы показываются сразу при вводе,
-    /// а не всплывают при сохранении.
     public var codeError: String? {
         let trimmed = code.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty { return "Number is required" }
@@ -178,10 +142,8 @@ public final class CDKAddEditViewModel {
         return nil
     }
 
-    /// Можно ли сохранять.
     public var isValid: Bool { titleError == nil && codeError == nil }
 
-    /// Сохраняет карту и возвращает её снимок.
     public func save() throws -> CDKCardSnapshot {
         let trimmedNote = note.trimmingCharacters(in: .whitespacesAndNewlines)
         let card = original.replacing(

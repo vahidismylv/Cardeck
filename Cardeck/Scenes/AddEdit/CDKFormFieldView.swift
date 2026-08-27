@@ -1,16 +1,7 @@
-//
-//  CDKFormFieldView.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Поле формы: подпись, ввод и место под сообщение об ошибке.
-///
-/// Ошибка живёт прямо под полем и появляется во время ввода, а не при сохранении.
 public final class CDKFormFieldView: UIView {
 
-    /// Текст изменился.
     public var onChange: ((String) -> Void)?
 
     private let captionLabel = UILabel()
@@ -18,18 +9,11 @@ public final class CDKFormFieldView: UIView {
     private let container = UIView()
     private let textField = UITextField()
 
-    /// Текущее значение поля.
     public var text: String {
         get { textField.text ?? "" }
         set { textField.text = newValue }
     }
 
-    /// Создаёт поле формы.
-    ///
-    /// - Parameters:
-    ///   - caption: подпись над полем.
-    ///   - placeholder: подсказка внутри поля.
-    ///   - keyboard: тип клавиатуры; для номера — цифровая с кнопкой Done.
     public init(caption: String, placeholder: String, keyboard: UIKeyboardType = .default) {
         super.init(frame: .zero)
         setUp(caption: caption, placeholder: placeholder, keyboard: keyboard)
@@ -38,7 +22,6 @@ public final class CDKFormFieldView: UIView {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError("init(coder:) не поддерживается") }
 
-    /// Показывает или убирает сообщение об ошибке.
     public func setError(_ message: String?) {
         errorLabel.text = message
         errorLabel.isHidden = message == nil
@@ -48,7 +31,6 @@ public final class CDKFormFieldView: UIView {
         accessibilityHint = message
     }
 
-    /// Ставит фокус в поле.
     @discardableResult
     public override func becomeFirstResponder() -> Bool {
         textField.becomeFirstResponder()
@@ -58,12 +40,10 @@ public final class CDKFormFieldView: UIView {
         captionLabel.text = caption
         captionLabel.font = CDKTheme.Font.caption
         captionLabel.textColor = CDKTheme.Color.textSecondary
-        captionLabel.adjustsFontForContentSizeCategory = true
 
         errorLabel.font = CDKTheme.Font.caption
         errorLabel.textColor = CDKTheme.Color.destructive
         errorLabel.numberOfLines = 0
-        errorLabel.adjustsFontForContentSizeCategory = true
         errorLabel.isHidden = true
 
         container.backgroundColor = CDKTheme.Color.surface
@@ -74,7 +54,6 @@ public final class CDKFormFieldView: UIView {
 
         textField.font = CDKTheme.Font.body
         textField.textColor = CDKTheme.Color.textPrimary
-        textField.adjustsFontForContentSizeCategory = true
         textField.keyboardType = keyboard
         textField.autocorrectionType = .no
         textField.attributedPlaceholder = NSAttributedString(
@@ -125,7 +104,6 @@ public final class CDKFormFieldView: UIView {
         ])
     }
 
-    /// Цифровой клавиатуре нужна своя кнопка закрытия — системной у неё нет.
     private func makeDoneToolbar() -> UIToolbar {
         let toolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 0, height: 44))
         toolbar.barStyle = .black

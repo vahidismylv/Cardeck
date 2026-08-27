@@ -1,14 +1,5 @@
-//
-//  CDKWalletViewController+Reorder.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Перетаскивание карт в стопке.
-///
-/// Карта поднимается системным лифтом до масштаба ``CDKTheme/Card/liftedScale``
-/// и получает усиленную тень; при защёлкивании в новую позицию играет паттерн snap.
 extension CDKWalletViewController: UICollectionViewDragDelegate {
 
     public func collectionView(
@@ -44,7 +35,6 @@ extension CDKWalletViewController: UICollectionViewDragDelegate {
         endLift(in: collectionView)
     }
 
-    /// Скруглённый контур превью: без него система рисует прямоугольную подложку.
     private func previewParameters(
         for collectionView: UICollectionView,
         at indexPath: IndexPath
@@ -61,7 +51,6 @@ extension CDKWalletViewController: UICollectionViewDragDelegate {
         return parameters
     }
 
-    /// Снимает подъём с карты и гасит непрерывную отдачу.
     private func endLift(in collectionView: UICollectionView) {
         if let lifted = stackLayout.liftedIndexPath {
             (collectionView.cellForItem(at: lifted) as? CDKCardCell)?.setLifted(false)

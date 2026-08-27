@@ -1,14 +1,7 @@
-//
-//  CDKEmptyStateView.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Пустое состояние стопки: крупная иллюстрация карты с бликом и призыв к действию.
 public final class CDKEmptyStateView: UIView {
 
-    /// Нажатие на «Добавить первую карту».
     public var onAddTapped: (() -> Void)?
 
     private let illustration = UIView()
@@ -63,14 +56,12 @@ public final class CDKEmptyStateView: UIView {
         titleLabel.font = CDKTheme.Font.title
         titleLabel.textColor = CDKTheme.Color.textPrimary
         titleLabel.textAlignment = .center
-        titleLabel.adjustsFontForContentSizeCategory = true
 
         subtitleLabel.text = "Add a loyalty card and it will always be within reach."
         subtitleLabel.font = CDKTheme.Font.body
         subtitleLabel.textColor = CDKTheme.Color.textSecondary
         subtitleLabel.textAlignment = .center
         subtitleLabel.numberOfLines = 0
-        subtitleLabel.adjustsFontForContentSizeCategory = true
 
         var configuration = UIButton.Configuration.filled()
         configuration.title = "Add your first card"
@@ -85,7 +76,6 @@ public final class CDKEmptyStateView: UIView {
             trailing: CDKTheme.Spacing.l
         )
         addButton.configuration = configuration
-        addButton.titleLabel?.adjustsFontForContentSizeCategory = true
         addButton.addAction(
             UIAction { [weak self] _ in self?.onAddTapped?() },
             for: .touchUpInside
@@ -141,7 +131,6 @@ public final class CDKEmptyStateView: UIView {
 
 public extension NSLayoutConstraint {
 
-    /// Возвращает то же ограничение с заданным приоритетом — для цепочек в `activate`.
     func cdkWithPriority(_ priority: UILayoutPriority) -> NSLayoutConstraint {
         self.priority = priority
         return self

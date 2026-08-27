@@ -1,11 +1,5 @@
-//
-//  CDKCategory.swift
-//  Cardeck
-//
-
 import Foundation
 
-/// Категория карты — используется для подписи на карте и группировки.
 public nonisolated enum CDKCategory: String, CaseIterable, Codable, Sendable {
 
     case grocery
@@ -17,7 +11,6 @@ public nonisolated enum CDKCategory: String, CaseIterable, Codable, Sendable {
     case transport
     case other
 
-    /// Название категории для интерфейса.
     public var title: String {
         switch self {
         case .grocery: "Grocery"
@@ -31,7 +24,6 @@ public nonisolated enum CDKCategory: String, CaseIterable, Codable, Sendable {
         }
     }
 
-    /// SF Symbol категории.
     public var symbolName: String {
         switch self {
         case .grocery: "cart.fill"

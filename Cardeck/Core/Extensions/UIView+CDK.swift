@@ -1,19 +1,12 @@
-//
-//  UIView+CDK.swift
-//  Cardeck
-//
-
 import UIKit
 
 public extension UIView {
 
-    /// Добавляет subview, отключая авторезайзинг-маску: вся вёрстка идёт кодом.
     func cdkAddSubview(_ view: UIView) {
         view.translatesAutoresizingMaskIntoConstraints = false
         addSubview(view)
     }
 
-    /// Прижимает вью к краям указанной области с одинаковым отступом.
     func cdkPin(to guide: UILayoutGuide, inset: CGFloat = 0) {
         NSLayoutConstraint.activate([
             leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: inset),
@@ -23,7 +16,6 @@ public extension UIView {
         ])
     }
 
-    /// Прижимает вью к краям родителя с одинаковым отступом.
     func cdkPin(to view: UIView, inset: CGFloat = 0) {
         NSLayoutConstraint.activate([
             leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: inset),
@@ -36,9 +28,6 @@ public extension UIView {
 
 public extension CALayer {
 
-    /// Выставляет параметры тени карты вместе с `shadowPath`.
-    ///
-    /// `shadowPath` обязателен: без него каждый кадр уходит в offscreen-проход.
     func cdkApplyCardShadow(cornerRadius: CGFloat, lifted: Bool = false) {
         shadowColor = CDKTheme.Shadow.color
         shadowOffset = lifted ? CDKTheme.Shadow.liftedOffset : CDKTheme.Shadow.offset
@@ -51,7 +40,6 @@ public extension CALayer {
 
 public extension CGFloat {
 
-    /// Ограничение значения диапазоном.
     func cdkClamped(_ lower: CGFloat, _ upper: CGFloat) -> CGFloat {
         Swift.min(Swift.max(self, lower), upper)
     }

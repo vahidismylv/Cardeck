@@ -1,14 +1,5 @@
-//
-//  CDKAppDelegate.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Точка входа приложения.
-///
-/// Никакой работы при запуске здесь не делается: стопка карт должна появиться
-/// на экране сразу, без искусственного лоадера.
 @main
 public final class CDKAppDelegate: UIResponder, UIApplicationDelegate {
 

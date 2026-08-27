@@ -1,38 +1,25 @@
-//
-//  CDKAddEditView.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Вёрстка формы добавления и редактирования карты.
-///
-/// Сверху — живое превью карты в натуральную величину: набрал название — оно
-/// на карте, сменил градиент — карта перекрасилась. При появлении клавиатуры
-/// контент поднимается через `keyboardLayoutGuide`, а превью уменьшается,
-/// чтобы поля не выталкивались за экран даже на iPhone SE.
 public final class CDKAddEditView: UIView {
 
-    /// Изменилось название.
     public var onTitleChange: ((String) -> Void)?
-    /// Изменился номер.
+
     public var onCodeChange: ((String) -> Void)?
-    /// Изменилась заметка.
+
     public var onNoteChange: ((String) -> Void)?
-    /// Выбран тип кода.
+
     public var onCodeTypeChange: ((CDKCodeType) -> Void)?
-    /// Выбрана категория.
+
     public var onCategoryChange: ((CDKCategory) -> Void)?
-    /// Выбран градиент.
+
     public var onGradientChange: ((Int) -> Void)?
-    /// Нажато сохранение.
+
     public var onSave: (() -> Void)?
-    /// Нажата отмена.
+
     public var onCancel: (() -> Void)?
 
-    /// Превью карты — оно же живой материал.
     public let previewCard = CDKDetailCardView()
-    /// Пикер градиентов.
+
     public let gradientPicker: CDKGradientPickerView
 
     private let scrollView = UIScrollView()
@@ -56,7 +43,6 @@ public final class CDKAddEditView: UIView {
     private var previewHeight: NSLayoutConstraint?
     private var previewWidth: NSLayoutConstraint?
 
-    /// Создаёт форму.
     public init(haptics: CDKHapticsServiceProtocol) {
         gradientPicker = CDKGradientPickerView(haptics: haptics)
         super.init(frame: .zero)
@@ -75,9 +61,6 @@ public final class CDKAddEditView: UIView {
         previewHeight?.constant = CDKTheme.Card.height(forWidth: width)
     }
 
-    // MARK: - Наполнение
-
-    /// Обновляет экран под текущее состояние вью-модели.
     public func apply(_ viewModel: CDKAddEditViewModel) {
         headerLabel.text = viewModel.screenTitle
         saveButton.configuration?.title = viewModel.saveTitle
@@ -98,7 +81,6 @@ public final class CDKAddEditView: UIView {
         }
     }
 
-    /// Ставит начальные значения полей — вызывается один раз при открытии.
     public func fill(from viewModel: CDKAddEditViewModel) {
         titleField.text = viewModel.title
         codeField.text = viewModel.code
@@ -106,20 +88,17 @@ public final class CDKAddEditView: UIView {
         gradientPicker.select(index: viewModel.gradientIndex, animated: false)
     }
 
-    /// Меню выбора категории.
     public func setCategoryMenu(_ menu: UIMenu) {
         categoryControl.menu = menu
         categoryControl.showsMenuAsPrimaryAction = true
     }
 
-    /// Уменьшает превью, когда поднимается клавиатура.
     public func setPreviewCompact(_ compact: Bool) {
         previewCard.transform = compact
             ? CGAffineTransform(scaleX: 0.8, y: 0.8)
             : .identity
     }
 
-    /// Ставит фокус в первое поле.
     public func focusFirstField() {
         titleField.becomeFirstResponder()
     }
@@ -127,7 +106,6 @@ public final class CDKAddEditView: UIView {
     private func setUp() {
         headerLabel.font = CDKTheme.Font.title
         headerLabel.textColor = CDKTheme.Color.textPrimary
-        headerLabel.adjustsFontForContentSizeCategory = true
 
         var cancelConfiguration = UIButton.Configuration.plain()
         cancelConfiguration.image = UIImage(systemName: "xmark")
@@ -208,7 +186,7 @@ public final class CDKAddEditView: UIView {
             ),
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            // Клавиатура поднимает контент: нижний край скролла идёт за ней.
+
             scrollView.bottomAnchor.constraint(equalTo: keyboardLayoutGuide.topAnchor),
 
             contentStack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),

@@ -1,17 +1,7 @@
-//
-//  CDKMockData.swift
-//  Cardeck
-//
-
 import Foundation
 
-/// Демонстрационный набор карт.
-///
-/// Используется до подключения SwiftData (блок 3), в превью и в тестах производительности
-/// стопки: `stress(count:)` разворачивает набор до произвольного размера.
 public enum CDKMockData {
 
-    /// Двенадцать карт, покрывающих все восемь градиентов и все типы кодов.
     public static var cards: [CDKCardSnapshot] {
         let raw: [(String, String, CDKCodeType, Int, CDKCategory)] = [
             ("Carrefour", "4820471193058", .code128, 0, .grocery),
@@ -47,7 +37,6 @@ public enum CDKMockData {
         }
     }
 
-    /// Набор заданного размера для проверки производительности стопки.
     public static func stress(count: Int) -> [CDKCardSnapshot] {
         let base = cards
         return (0..<count).map { index in

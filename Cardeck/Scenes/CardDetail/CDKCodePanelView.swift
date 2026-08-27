@@ -1,15 +1,5 @@
-//
-//  CDKCodePanelView.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Панель со штриховым кодом карты.
-///
-/// Код всегда лежит на белом фоне: сканеры рассчитывают на светлую подложку,
-/// а тёмная тема приложения её не даёт. Изображение показывается без сглаживания —
-/// размытый код не читается.
 public final class CDKCodePanelView: UIView {
 
     private let codeContainer = UIView()
@@ -28,13 +18,8 @@ public final class CDKCodePanelView: UIView {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError("init(coder:) не поддерживается") }
 
-    /// Готовое изображение кода, если оно уже построено.
     public var currentCodeImage: UIImage? { codeImageView.image }
 
-    /// Показывает индикатор, пока код строится.
-    ///
-    /// Белая подложка на это время гасится: пустой белый прямоугольник мелькал
-    /// во время перехода и выглядел как незагрузившаяся картинка.
     public func showLoading() {
         spinner.startAnimating()
         codeContainer.backgroundColor = .clear
@@ -42,7 +27,6 @@ public final class CDKCodePanelView: UIView {
         messageLabel.isHidden = true
     }
 
-    /// Показывает готовый код.
     public func show(image: UIImage, aspectRatio: CGFloat, number: String) {
         spinner.stopAnimating()
         codeContainer.backgroundColor = .white
@@ -54,7 +38,6 @@ public final class CDKCodePanelView: UIView {
         accessibilityLabel = "Barcode, \(number)"
     }
 
-    /// Показывает fallback: крупный номер вместо кода и причину отказа.
     public func show(error: CDKBarcodeError, number: String) {
         spinner.stopAnimating()
         codeContainer.backgroundColor = .clear
@@ -86,21 +69,19 @@ public final class CDKCodePanelView: UIView {
         codeContainer.layer.cornerCurve = .continuous
 
         codeImageView.contentMode = .scaleAspectFit
-        // Без этого масштабирование размывает модули кода и сканер его не берёт.
+
         codeImageView.layer.magnificationFilter = .nearest
         codeImageView.layer.minificationFilter = .nearest
 
         numberLabel.font = CDKTheme.Font.mono(20, .semibold)
         numberLabel.textColor = CDKTheme.Color.textPrimary
         numberLabel.textAlignment = .center
-        numberLabel.adjustsFontForContentSizeCategory = true
         numberLabel.numberOfLines = 0
 
         messageLabel.font = CDKTheme.Font.caption
         messageLabel.textColor = CDKTheme.Color.textSecondary
         messageLabel.textAlignment = .center
         messageLabel.numberOfLines = 0
-        messageLabel.adjustsFontForContentSizeCategory = true
         messageLabel.isHidden = true
 
         spinner.color = CDKTheme.Color.textSecondary
@@ -157,7 +138,6 @@ public final class CDKCodePanelView: UIView {
 
 public extension UIView {
 
-    /// Ограничения «прижать к краям» списком — удобно вкладывать в `activate`.
     func cdkPinConstraints(to view: UIView, inset: CGFloat = 0) -> [NSLayoutConstraint] {
         [
             leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: inset),

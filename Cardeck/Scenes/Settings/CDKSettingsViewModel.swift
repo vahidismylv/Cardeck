@@ -1,30 +1,19 @@
-//
-//  CDKSettingsViewModel.swift
-//  Cardeck
-//
-
 import Foundation
 
-/// Вью-модель настроек.
-///
-/// Держит доступ к настройкам и хранилищу; про UIKit не знает.
 public final class CDKSettingsViewModel {
 
-    /// Вызывается после изменения любой настройки.
     public var onChange: (() -> Void)?
-    /// Вызывается после сброса данных.
+
     public var onReset: (() -> Void)?
 
     private let preferences: CDKPreferencesProtocol
     private let store: CDKCardStore
 
-    /// Создаёт вью-модель настроек.
     public init(preferences: CDKPreferencesProtocol, store: CDKCardStore) {
         self.preferences = preferences
         self.store = store
     }
 
-    /// Порядок сортировки стопки.
     public var sortOrder: CDKSortOrder {
         get { preferences.sortOrder }
         set {
@@ -33,7 +22,6 @@ public final class CDKSettingsViewModel {
         }
     }
 
-    /// Тактильная отдача включена.
     public var hapticsEnabled: Bool {
         get { preferences.hapticsEnabled }
         set {
@@ -42,7 +30,6 @@ public final class CDKSettingsViewModel {
         }
     }
 
-    /// Авто-яркость на детальном экране включена.
     public var autoBrightnessEnabled: Bool {
         get { preferences.autoBrightnessEnabled }
         set {
@@ -51,10 +38,6 @@ public final class CDKSettingsViewModel {
         }
     }
 
-    /// Голографический материал включён.
-    ///
-    /// Выключение уводит карты на fallback-материал: он дешевле по GPU
-    /// и заметно помогает на слабых устройствах.
     public var holographicEnabled: Bool {
         get { preferences.holographicEnabled }
         set {
@@ -63,7 +46,6 @@ public final class CDKSettingsViewModel {
         }
     }
 
-    /// Версия и билд из `Bundle`.
     public var versionText: String {
         let bundle = Bundle.main
         let version = bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString")
@@ -71,7 +53,6 @@ public final class CDKSettingsViewModel {
         return "Version \(version as? String ?? "—") (\(build as? String ?? "—"))"
     }
 
-    /// Удаляет все карты.
     public func resetData() {
         try? store.deleteAll()
         onReset?()

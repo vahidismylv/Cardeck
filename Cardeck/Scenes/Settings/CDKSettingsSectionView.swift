@@ -1,27 +1,16 @@
-//
-//  CDKSettingsSectionView.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Секция настроек — карточка на поверхности с заголовком и строками.
-///
-/// Своя вёрстка вместо системного списка: приложение целиком построено
-/// на карточной метафоре, и настройки не должны из неё выпадать.
 public final class CDKSettingsSectionView: UIView {
 
     private let titleLabel = UILabel()
     private let rowsStack = UIStackView()
     private let card = UIView()
 
-    /// Создаёт секцию с заголовком.
     public init(title: String) {
         super.init(frame: .zero)
         titleLabel.text = title.uppercased()
         titleLabel.font = CDKTheme.Font.caption
         titleLabel.textColor = CDKTheme.Color.textSecondary
-        titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.accessibilityTraits = .header
 
         card.backgroundColor = CDKTheme.Color.surface
@@ -55,7 +44,6 @@ public final class CDKSettingsSectionView: UIView {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError("init(coder:) не поддерживается") }
 
-    /// Добавляет строку в секцию, отделяя её от предыдущей разделителем.
     public func addRow(_ row: UIView) {
         if !rowsStack.arrangedSubviews.isEmpty {
             rowsStack.addArrangedSubview(makeSeparator())
@@ -72,22 +60,18 @@ public final class CDKSettingsSectionView: UIView {
     }
 }
 
-/// Строка настроек с тумблером.
 public final class CDKSettingsToggleRow: UIView {
 
-    /// Тумблер переключён.
     public var onToggle: ((Bool) -> Void)?
 
     private let toggle = UISwitch()
 
-    /// Создаёт строку с подписью и тумблером.
     public init(title: String, subtitle: String? = nil) {
         super.init(frame: .zero)
         let titleLabel = UILabel()
         titleLabel.text = title
         titleLabel.font = CDKTheme.Font.body
         titleLabel.textColor = CDKTheme.Color.textPrimary
-        titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.numberOfLines = 0
 
         let stack = UIStackView(arrangedSubviews: [titleLabel])
@@ -99,7 +83,6 @@ public final class CDKSettingsToggleRow: UIView {
             subtitleLabel.font = CDKTheme.Font.caption
             subtitleLabel.textColor = CDKTheme.Color.textSecondary
             subtitleLabel.numberOfLines = 0
-            subtitleLabel.adjustsFontForContentSizeCategory = true
             stack.addArrangedSubview(subtitleLabel)
         }
 
@@ -121,7 +104,6 @@ public final class CDKSettingsToggleRow: UIView {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError("init(coder:) не поддерживается") }
 
-    /// Ставит положение тумблера без вызова обработчика.
     public func setOn(_ isOn: Bool) {
         toggle.setOn(isOn, animated: false)
     }

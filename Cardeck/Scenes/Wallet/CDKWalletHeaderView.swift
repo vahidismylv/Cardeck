@@ -1,19 +1,9 @@
-//
-//  CDKWalletHeaderView.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Плавающий заголовок стопки: название экрана, счётчик и две кнопки.
-///
-/// Живёт над коллекцией: прижатые карты уходят под него, поэтому его высота
-/// передаётся раскладке через ``CDKCardStackLayout/headerHeight``.
 public final class CDKWalletHeaderView: UIView {
 
-    /// Нажатие «Добавить».
     public var onAddTapped: (() -> Void)?
-    /// Нажатие «Настройки».
+
     public var onSettingsTapped: (() -> Void)?
 
     private let titleLabel = UILabel()
@@ -29,7 +19,6 @@ public final class CDKWalletHeaderView: UIView {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError("init(coder:) не поддерживается") }
 
-    /// Обновляет подпись под заголовком; `nil` скрывает её.
     public func setSubtitle(_ text: String?) {
         subtitleLabel.text = text
         subtitleLabel.isHidden = text == nil
@@ -41,7 +30,6 @@ public final class CDKWalletHeaderView: UIView {
         titleLabel.text = "Cards"
         titleLabel.font = CDKTheme.Font.largeTitle
         titleLabel.textColor = CDKTheme.Color.textPrimary
-        titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.numberOfLines = 1
         titleLabel.adjustsFontSizeToFitWidth = true
         titleLabel.minimumScaleFactor = 0.7
@@ -49,7 +37,6 @@ public final class CDKWalletHeaderView: UIView {
 
         subtitleLabel.font = CDKTheme.Font.callout
         subtitleLabel.textColor = CDKTheme.Color.textSecondary
-        subtitleLabel.adjustsFontForContentSizeCategory = true
 
         configure(settingsButton, symbol: "gearshape", label: "Settings") { [weak self] in
             self?.onSettingsTapped?()
@@ -58,8 +45,6 @@ public final class CDKWalletHeaderView: UIView {
             self?.onAddTapped?()
         }
 
-        // Счётчик стоит в одну строку с заголовком: аккордеон прижатых карт
-        // и так занимает высоту, лишняя строка сверху делает пустоту заметной.
         let titleStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
         titleStack.axis = .horizontal
         titleStack.alignment = .firstBaseline

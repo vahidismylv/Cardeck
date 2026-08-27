@@ -1,23 +1,11 @@
-//
-//  CDKUndoToastView.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Всплывающее сообщение внизу экрана с необязательным действием.
-///
-/// Основной сценарий — «карта удалена / отменить»: карта исчезает из стопки
-/// сразу, но из хранилища уходит только по истечении окна отмены. Тот же тост
-/// без действия сообщает об ошибке записи.
 public final class CDKUndoToastView: UIView {
 
-    /// Сколько времени висит тост.
     public static let lifetime: TimeInterval = 5
 
-    /// Нажата отмена.
     public var onUndo: (() -> Void)?
-    /// Окно отмены истекло или тост закрыт.
+
     public var onExpire: (() -> Void)?
 
     private let titleLabel = UILabel()
@@ -27,11 +15,6 @@ public final class CDKUndoToastView: UIView {
     private let message: String
     private let actionTitle: String?
 
-    /// Создаёт тост.
-    ///
-    /// - Parameters:
-    ///   - message: текст сообщения.
-    ///   - actionTitle: подпись действия; `nil` — тост без кнопки.
     public init(message: String = "Card deleted", actionTitle: String? = "Undo") {
         self.message = message
         self.actionTitle = actionTitle
@@ -46,7 +29,6 @@ public final class CDKUndoToastView: UIView {
         timer?.invalidate()
     }
 
-    /// Показывает тост поверх экрана.
     public func present(in host: UIView, above guide: UILayoutGuide) {
         host.cdkAddSubview(self)
         NSLayoutConstraint.activate([
@@ -78,7 +60,6 @@ public final class CDKUndoToastView: UIView {
         UIAccessibility.post(notification: .announcement, argument: titleLabel.text)
     }
 
-    /// Убирает тост.
     public func dismiss(undo: Bool) {
         timer?.invalidate()
         timer = nil
@@ -108,7 +89,6 @@ public final class CDKUndoToastView: UIView {
         titleLabel.text = message
         titleLabel.font = CDKTheme.Font.callout
         titleLabel.textColor = CDKTheme.Color.textPrimary
-        titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.numberOfLines = 0
 
         var configuration = UIButton.Configuration.plain()
@@ -116,7 +96,6 @@ public final class CDKUndoToastView: UIView {
         configuration.baseForegroundColor = CDKTheme.Color.accent
         configuration.contentInsets = .zero
         undoButton.configuration = configuration
-        undoButton.titleLabel?.adjustsFontForContentSizeCategory = true
         undoButton.setContentHuggingPriority(.required, for: .horizontal)
         undoButton.isHidden = actionTitle == nil
         undoButton.addAction(

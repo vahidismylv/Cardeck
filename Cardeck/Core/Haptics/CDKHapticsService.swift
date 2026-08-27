@@ -1,32 +1,21 @@
-//
-//  CDKHapticsService.swift
-//  Cardeck
-//
-
 import CoreHaptics
 import UIKit
 
-/// Тактильная отдача приложения.
 public protocol CDKHapticsServiceProtocol: AnyObject {
-    /// Короткий щелчок защёлкивания карты в стопку.
+
     func playSnap()
-    /// Лёгкий щелчок выбора — переключение градиента, сегмента.
+
     func playSelection()
-    /// Начинает непрерывную отдачу для жеста протягивания.
+
     func beginDrag()
-    /// Обновляет интенсивность непрерывной отдачи; `progress` в диапазоне 0...1.
+
     func updateDrag(progress: Double)
-    /// Завершает непрерывную отдачу.
+
     func endDrag()
 }
 
-/// Реализация тактильной отдачи на Core Haptics с откатом на `UIImpactFeedbackGenerator`.
-///
-/// Движок переподнимается из `resetHandler`/`stoppedHandler` и останавливается в фоне.
-/// Полностью выключается тумблером в настройках.
 public final class CDKHapticsService: CDKHapticsServiceProtocol {
 
-    /// Общий экземпляр сервиса.
     public static let shared = CDKHapticsService(preferences: CDKPreferences.shared)
 
     private let preferences: CDKPreferencesProtocol
@@ -37,7 +26,6 @@ public final class CDKHapticsService: CDKHapticsServiceProtocol {
     private var impactGenerator: UIImpactFeedbackGenerator?
     private var selectionGenerator: UISelectionFeedbackGenerator?
 
-    /// Создаёт сервис поверх заданных настроек.
     public init(preferences: CDKPreferencesProtocol) {
         self.preferences = preferences
         NotificationCenter.default.addObserver(
@@ -53,8 +41,6 @@ public final class CDKHapticsService: CDKHapticsServiceProtocol {
     }
 
     private var isEnabled: Bool { preferences.hapticsEnabled }
-
-    // MARK: - Паттерны
 
     public func playSnap() {
         guard isEnabled else { return }
@@ -123,9 +109,6 @@ public final class CDKHapticsService: CDKHapticsServiceProtocol {
         dragPlayer = nil
     }
 
-    // MARK: - Движок
-
-    /// Возвращает поднятый движок, создавая его при первой необходимости.
     private func preparedEngine() -> CHHapticEngine? {
         if let engine { return engine }
         guard let created = try? CHHapticEngine() else { return nil }

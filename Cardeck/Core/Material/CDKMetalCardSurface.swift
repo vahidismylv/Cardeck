@@ -1,15 +1,6 @@
-//
-//  CDKMetalCardSurface.swift
-//  Cardeck
-//
-
 import Metal
 import UIKit
 
-/// Вью с `CAMetalLayer`, на которой рисуется материал карты.
-///
-/// Перерисовывается только по требованию: при заметном изменении наклона,
-/// смене градиента или размера. Простой в покое GPU — сознательное решение.
 final class CDKMetalCardSurface: UIView {
 
     override class var layerClass: AnyClass { CAMetalLayer.self }
@@ -24,7 +15,6 @@ final class CDKMetalCardSurface: UIView {
     private var createdAt = CACurrentMediaTime()
     private var isFlat: Bool
 
-    /// Радиус скругления, вычисляемый шейдером. Смена радиуса перерисовывает кадр.
     var cornerRadius: CGFloat = CDKTheme.Radius.card {
         didSet {
             guard cornerRadius != oldValue else { return }
@@ -32,12 +22,10 @@ final class CDKMetalCardSurface: UIView {
         }
     }
 
-    /// Минимальное изменение наклона, оправдывающее новый кадр, рад.
     private static let tiltEpsilon = 0.002
-    /// Минимальный интервал между кадрами.
+
     private static let minimumFrameInterval: CFTimeInterval = 1.0 / 60.0
 
-    /// Создаёт поверхность материала для заданного градиента.
     init(renderer: CDKMetalCardRenderer, gradient: CDKGradientPreset, flat: Bool) {
         self.renderer = renderer
         self.gradient = gradient
@@ -63,22 +51,17 @@ final class CDKMetalCardSurface: UIView {
         }
     }
 
-    /// Меняет градиент и режим плоского цвета, вызывая перерисовку.
     func update(gradient: CDKGradientPreset, flat: Bool) {
         self.gradient = gradient
         self.isFlat = flat
         setNeedsRender(force: true)
     }
 
-    /// Принимает новый наклон; кадр рисуется, только если изменение заметно.
     func update(tilt: CDKTilt) {
         self.tilt = tilt
         setNeedsRender(force: false)
     }
 
-    /// Рисует кадр, если он действительно нужен.
-    ///
-    /// - Parameter force: пропустить проверки порога — например, при смене цвета.
     func setNeedsRender(force: Bool) {
         guard window != nil || force else { return }
         let now = CACurrentMediaTime()

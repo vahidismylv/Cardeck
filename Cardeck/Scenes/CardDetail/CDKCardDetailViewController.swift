@@ -1,30 +1,18 @@
-//
-//  CDKCardDetailViewController.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// События детального экрана для координатора.
 public protocol CDKCardDetailViewControllerDelegate: AnyObject {
-    /// Пользователь попросил отредактировать карту.
+
     func cardDetailDidRequestEdit(_ controller: CDKCardDetailViewController)
-    /// Пользователь попросил удалить карту.
+
     func cardDetailDidRequestDelete(_ controller: CDKCardDetailViewController)
-    /// Экран закрылся — координатор снимает удержание.
+
     func cardDetailDidDismiss(_ controller: CDKCardDetailViewController)
 }
 
-/// Карта во весь экран: живой материал, код и действия.
-///
-/// Вёрстка целиком лежит в ``CDKCardDetailView``; здесь — жизненный цикл,
-/// яркость, построение кода и доступность.
 public final class CDKCardDetailViewController: UIViewController {
 
-    /// Приёмник событий экрана.
     public weak var delegate: CDKCardDetailViewControllerDelegate?
 
-    /// Карта, показанная на экране.
     public var card: CDKCardSnapshot { viewModel.card }
 
     private let viewModel: CDKCardDetailViewModel
@@ -33,18 +21,15 @@ public final class CDKCardDetailViewController: UIViewController {
 
     private var codeTask: Task<Void, Never>?
 
-    /// Вёрстка экрана.
     private var contentView: CDKCardDetailView {
-        // swiftlint:disable:next force_cast
+
         view as! CDKCardDetailView
     }
 
-    /// Карта со слотом под материал — нужна аниматору перехода.
     var cardView: CDKDetailCardView { contentView.cardView }
-    /// Контент, который появляется вторым аниматором после карты.
+
     var animatableContent: [UIView] { contentView.animatableContent }
 
-    /// Создаёт детальный экран.
     public init(
         viewModel: CDKCardDetailViewModel,
         barcodeService: CDKBarcodeServicing,
@@ -62,7 +47,7 @@ public final class CDKCardDetailViewController: UIViewController {
 
     deinit {
         codeTask?.cancel()
-        // Страховка на случай, что экран умер минуя viewWillDisappear.
+
         brightnessService.restoreImmediately()
     }
 
@@ -107,12 +92,9 @@ public final class CDKCardDetailViewController: UIViewController {
         }
     }
 
-    /// Возвращает экран в рабочее состояние после отменённого закрытия.
     func restoreAfterCancelledDismissal() {
         contentView.restoreAfterCancelledDismissal()
     }
-
-    // MARK: - Связи
 
     private func bindActions() {
         contentView.onShowCode = { [weak self] in self?.showFullScreenCode() }
@@ -142,8 +124,6 @@ public final class CDKCardDetailViewController: UIViewController {
             }
         }
     }
-
-    // MARK: - Код
 
     private func loadCode() {
         contentView.codePanel.showLoading()

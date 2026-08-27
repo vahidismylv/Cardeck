@@ -1,20 +1,7 @@
-//
-//  CDKCardSorting.swift
-//  Cardeck
-//
-
 import Foundation
 
-/// Чистые функции сортировки и переупорядочивания стопки.
-///
-/// Вынесены отдельно от хранилища, чтобы покрыть тестами без контекста SwiftData.
 public nonisolated enum CDKCardSorting {
 
-    /// Применяет порядок сортировки к набору карт.
-    ///
-    /// - Ручной порядок — по `sortIndex`.
-    /// - По частоте — сначала недавно использованные, затем ни разу не открытые.
-    /// - По алфавиту — регистронезависимо, с локальным сравнением.
     public static func apply(
         _ order: CDKSortOrder,
         to cards: [CDKCardSnapshot]
@@ -45,9 +32,6 @@ public nonisolated enum CDKCardSorting {
         }
     }
 
-    /// Переставляет карту и пересчитывает `sortIndex` подряд, начиная с нуля.
-    ///
-    /// Индексы вне диапазона игнорируются: массив возвращается без изменений.
     public static func reorder(
         _ cards: [CDKCardSnapshot],
         from source: Int,
@@ -64,15 +48,13 @@ public nonisolated enum CDKCardSorting {
         return reindexed(result)
     }
 
-    /// Проставляет `sortIndex` по текущему порядку массива.
     public static func reindexed(_ cards: [CDKCardSnapshot]) -> [CDKCardSnapshot] {
         cards.enumerated().map { $0.element.replacing(sortIndex: $0.offset) }
     }
 }
 
-public extension CDKCardSnapshot {
+public nonisolated extension CDKCardSnapshot {
 
-    /// Возвращает копию снимка с изменёнными полями.
     func replacing(
         title: String? = nil,
         code: String? = nil,

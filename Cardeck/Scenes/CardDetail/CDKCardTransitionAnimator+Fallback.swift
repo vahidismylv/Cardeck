@@ -1,17 +1,7 @@
-//
-//  CDKCardTransitionAnimator+Fallback.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Запасной путь перехода.
 extension CDKCardTransitionAnimator {
 
-    /// Резервная анимация, если ячейку-источник найти не удалось.
-    ///
-    /// Такое возможно, когда стопка перестроилась под нами; лучше показать
-    /// честное растворение, чем уронить переход.
     func makeFallbackAnimator(
         _ context: any UIViewControllerContextTransitioning,
         animator: UIViewPropertyAnimator

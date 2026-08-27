@@ -1,14 +1,5 @@
-//
-//  CDKCardSnapshot.swift
-//  Cardeck
-//
-
 import Foundation
 
-/// Неизменяемый снимок карты для вью-моделей и ячеек.
-///
-/// Значение вместо ссылки: снимок безопасно сравнивать в diffable data source
-/// и передавать между потоками, не таща за собой контекст SwiftData.
 public nonisolated struct CDKCardSnapshot: Identifiable, Hashable, Sendable {
 
     public let id: UUID
@@ -22,7 +13,6 @@ public nonisolated struct CDKCardSnapshot: Identifiable, Hashable, Sendable {
     public let lastUsedAt: Date?
     public let sortIndex: Int
 
-    /// Создаёт снимок карты.
     public init(
         id: UUID,
         title: String,
@@ -47,23 +37,19 @@ public nonisolated struct CDKCardSnapshot: Identifiable, Hashable, Sendable {
         self.sortIndex = sortIndex
     }
 
-    /// Последние четыре значащих символа номера — то, что печатают на карте.
     public var lastFourDigits: String {
         let significant = code.filter { !$0.isWhitespace }
         return String(significant.suffix(4))
     }
 
-    /// Маскированный номер вида «•••• 4821».
     public var maskedCode: String {
         lastFourDigits.isEmpty ? "—" : "•••• \(lastFourDigits)"
     }
 
-    /// Градиентный пресет карты.
     public var gradient: CDKGradientPreset {
         CDKGradientPalette.preset(at: gradientIndex)
     }
 
-    /// Описание карты для VoiceOver: «Название, категория, номер оканчивается на XXXX».
     public var accessibilityDescription: String {
         let tail = lastFourDigits.isEmpty
             ? "no number"

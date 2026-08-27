@@ -1,32 +1,17 @@
-//
-//  CDKCardCell.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Действия, доступные над картой прямо из стопки — через custom actions VoiceOver.
 public protocol CDKCardCellDelegate: AnyObject {
     func cardCellDidRequestShowCode(_ cell: CDKCardCell)
     func cardCellDidRequestEdit(_ cell: CDKCardCell)
     func cardCellDidRequestDelete(_ cell: CDKCardCell)
 }
 
-/// Ячейка карты в стопке.
-///
-/// Слои снизу вверх: материал (Metal или fallback), затем контент — название,
-/// последние четыре цифры и категория. Тень живёт на слое ячейки и всегда имеет
-/// `shadowPath`, поэтому offscreen-проходов не возникает.
 public final class CDKCardCell: UICollectionViewCell {
 
-    /// Идентификатор для регистрации в коллекции.
     public static let reuseIdentifier = "CDKCardCell"
 
-    /// Приёмник действий доступности.
     public weak var delegate: CDKCardCellDelegate?
 
-    /// Материал карты. Публичный, потому что переход в детальный экран
-    /// переносит эту вью в `containerView` вместо снимка.
     public private(set) var materialView: CDKCardMaterialView?
 
     private let titleLabel = UILabel()
@@ -35,7 +20,6 @@ public final class CDKCardCell: UICollectionViewCell {
     private let categoryIcon = UIImageView()
 
     private var snapshot: CDKCardSnapshot?
-    private var categoryStack: UIStackView?
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -47,7 +31,7 @@ public final class CDKCardCell: UICollectionViewCell {
 
     public override func layoutSubviews() {
         super.layoutSubviews()
-        // shadowPath обязателен: без него тень пересчитывается растеризацией каждый кадр.
+
         layer.cdkApplyCardShadow(cornerRadius: CDKTheme.Radius.card)
     }
 
@@ -62,16 +46,13 @@ public final class CDKCardCell: UICollectionViewCell {
         setLifted(false)
     }
 
-    // MARK: - Наполнение
-
-    /// Наполняет ячейку данными карты и поднимает под неё материал.
     public func configure(with card: CDKCardSnapshot) {
         snapshot = card
         let material = materialView ?? makeMaterialView()
         material.update(gradient: card.gradient)
         material.startMotionUpdates()
 
-        let foreground = card.gradient.end.cdkReadableForeground
+        let foreground = card.gradient.foregroundColor
         titleLabel.text = card.title
         titleLabel.textColor = foreground
         codeLabel.text = card.maskedCode
@@ -81,20 +62,14 @@ public final class CDKCardCell: UICollectionViewCell {
         categoryIcon.image = UIImage(systemName: card.category.symbolName)
         categoryIcon.tintColor = foreground.withAlphaComponent(0.75)
 
-        updateCategoryVisibility()
         configureAccessibility(with: card)
     }
 
-    /// Прячет категорию, когда шрифт крупный: иначе подпись обрезает соседняя карта.
-    private func updateCategoryVisibility() {
-        categoryStack?.isHidden = traitCollection.preferredContentSizeCategory
-            .isAccessibilityCategory
+    @objc private func handleContrastChange() {
+        guard let snapshot else { return }
+        configure(with: snapshot)
     }
 
-    /// Возвращает материал ячейке после завершения перехода.
-    ///
-    /// Переход забирает материал в `containerView`; по окончании вью надо вернуть
-    /// на место, иначе ячейка останется пустой при переиспользовании.
     public func reclaimMaterialView(_ view: CDKCardMaterialView) {
         materialView = view
         view.cornerRadius = CDKTheme.Radius.card
@@ -104,7 +79,6 @@ public final class CDKCardCell: UICollectionViewCell {
         view.startMotionUpdates()
     }
 
-    /// Отдаёт материал наружу, оставляя ячейку без него.
     public func detachMaterialView() -> CDKCardMaterialView? {
         guard let materialView else { return nil }
         materialView.stopMotionUpdates()
@@ -113,12 +87,9 @@ public final class CDKCardCell: UICollectionViewCell {
         return materialView
     }
 
-    /// Подъём карты пальцем при переупорядочивании: усиленная тень.
     public func setLifted(_ lifted: Bool) {
         layer.cdkApplyCardShadow(cornerRadius: CDKTheme.Radius.card, lifted: lifted)
     }
-
-    // MARK: - Приватное
 
     private func makeMaterialView() -> CDKCardMaterialView {
         let material = CDKCardMaterialView(gradient: CDKGradientPalette.preset(at: 0))
@@ -137,25 +108,23 @@ public final class CDKCardCell: UICollectionViewCell {
 
         titleLabel.font = CDKTheme.Font.title
         titleLabel.numberOfLines = 2
-        titleLabel.adjustsFontForContentSizeCategory = true
 
         codeLabel.font = CDKTheme.Font.mono(15)
-        codeLabel.adjustsFontForContentSizeCategory = true
 
         categoryLabel.font = CDKTheme.Font.caption
-        categoryLabel.adjustsFontForContentSizeCategory = true
         categoryIcon.contentMode = .scaleAspectFit
         categoryIcon.setContentHuggingPriority(.required, for: .horizontal)
 
         let categoryStack = UIStackView(arrangedSubviews: [categoryIcon, categoryLabel])
         categoryStack.spacing = CDKTheme.Spacing.xs
         categoryStack.alignment = .center
-        self.categoryStack = categoryStack
 
-        // На accessibility-размерах в видимую полосу карты влезает только название.
-        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) {
-            (cell: CDKCardCell, _) in cell.updateCategoryVisibility()
-        }
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleContrastChange),
+            name: UIAccessibility.darkerSystemColorsStatusDidChangeNotification,
+            object: nil
+        )
 
         contentView.cdkAddSubview(titleLabel)
         contentView.cdkAddSubview(codeLabel)

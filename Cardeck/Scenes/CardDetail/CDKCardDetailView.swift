@@ -1,30 +1,19 @@
-//
-//  CDKCardDetailView.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Вёрстка детального экрана: карта, панель кода и кнопки действий.
-///
-/// Вынесена из контроллера: тот отвечает за жизненный цикл, яркость и построение
-/// кода, а вся геометрия живёт здесь.
 public final class CDKCardDetailView: UIView {
 
-    /// Нажатие «Show code».
     public var onShowCode: (() -> Void)?
-    /// Нажатие «Edit».
+
     public var onEdit: (() -> Void)?
-    /// Нажатие «Delete».
+
     public var onDelete: (() -> Void)?
-    /// Нажатие крестика.
+
     public var onClose: (() -> Void)?
 
-    /// Карта со слотом под материал.
     public let cardView = CDKDetailCardView()
-    /// Панель со штриховым кодом.
+
     public let codePanel = CDKCodePanelView()
-    /// Скролл, внутри которого лежит весь контент.
+
     public let scrollView = UIScrollView()
 
     private let cardContainer = UIView()
@@ -35,7 +24,6 @@ public final class CDKCardDetailView: UIView {
     private var cardHeightConstraint: NSLayoutConstraint?
     private var cardWidthConstraint: NSLayoutConstraint?
 
-    /// Контент, который появляется вторым аниматором после прилёта карты.
     public var animatableContent: [UIView] { [codePanel, actionsStack, closeButton] }
 
     public override init(frame: CGRect) {
@@ -50,13 +38,11 @@ public final class CDKCardDetailView: UIView {
     public override func layoutSubviews() {
         super.layoutSubviews()
         updateCardSize()
-        scrollView.contentInset.top = safeAreaInsets.top + CDKTheme.Spacing.l
+
+        scrollView.contentInset.top = safeAreaInsets.top
+            + closeButton.bounds.height + CDKTheme.Spacing.s
     }
 
-    /// Возвращает экран в рабочее состояние после отменённого закрытия.
-    ///
-    /// Жест отменял скролл панели и мог оставить её в оттянутом положении,
-    /// поэтому её надо вернуть к началу.
     public func restoreAfterCancelledDismissal() {
         for view in animatableContent {
             view.alpha = 1
@@ -68,9 +54,6 @@ public final class CDKCardDetailView: UIView {
         )
     }
 
-    /// Размер карты по ширине экрана в пропорциях ID-1.
-    ///
-    /// Приложение работает только в портрете, поэтому ширину всегда задаёт экран.
     private func updateCardSize() {
         let width = (bounds.width - CDKTheme.Card.detailHorizontalInset * 2).rounded()
         guard width > 0 else { return }
@@ -85,8 +68,7 @@ public final class CDKCardDetailView: UIView {
     private func setUp() {
         scrollView.showsVerticalScrollIndicator = false
         scrollView.alwaysBounceVertical = true
-        // Верхний отступ задаём сами в layoutSubviews; автоматический прибавил бы
-        // safe area поверх него, и карта уехала бы вниз на её высоту второй раз.
+
         scrollView.contentInsetAdjustmentBehavior = .never
 
         contentStack.axis = .vertical
@@ -117,8 +99,6 @@ public final class CDKCardDetailView: UIView {
         closeButton.accessibilityLabel = "Close"
         closeButton.addAction(UIAction { [weak self] _ in self?.onClose?() }, for: .touchUpInside)
 
-        // Карта живёт в контейнере во всю ширину и центрируется в нём:
-        // её размер задан явными константами, а не растяжением по стеку.
         cardContainer.cdkAddSubview(cardView)
         contentStack.addArrangedSubview(cardContainer)
         contentStack.addArrangedSubview(codePanel)

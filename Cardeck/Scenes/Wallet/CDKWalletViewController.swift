@@ -1,28 +1,20 @@
-//
-//  CDKWalletViewController.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// События стопки, которые обрабатывает координатор.
 public protocol CDKWalletViewControllerDelegate: AnyObject {
-    /// Пользователь открыл карту.
+
     func walletViewController(
         _ controller: CDKWalletViewController,
         didSelect card: CDKCardSnapshot,
         from cell: CDKCardCell
     )
-    /// Пользователь запросил добавление карты.
+
     func walletViewControllerDidRequestAdd(_ controller: CDKWalletViewController)
-    /// Пользователь запросил настройки.
+
     func walletViewControllerDidRequestSettings(_ controller: CDKWalletViewController)
 }
 
-/// Главный экран: стопка карт.
 public final class CDKWalletViewController: UIViewController {
 
-    /// Приёмник событий экрана.
     public weak var delegate: CDKWalletViewControllerDelegate?
 
     private let viewModel: CDKWalletViewModel
@@ -34,7 +26,7 @@ public final class CDKWalletViewController: UIViewController {
         collectionViewLayout: stackLayout
     )
     private let headerView = CDKWalletHeaderView()
-    /// Разводит стопку на время перехода карты.
+
     private(set) lazy var stackReveal = CDKStackRevealAnimator(
         collectionView: collectionView, layout: stackLayout
     )
@@ -43,7 +35,6 @@ public final class CDKWalletViewController: UIViewController {
     private var dataSource: UICollectionViewDiffableDataSource<Int, CDKCardSnapshot>?
     private var undoToast: CDKUndoToastView?
 
-    /// Создаёт экран стопки.
     public init(viewModel: CDKWalletViewModel, haptics: CDKHapticsServiceProtocol) {
         self.viewModel = viewModel
         self.haptics = haptics
@@ -70,7 +61,7 @@ public final class CDKWalletViewController: UIViewController {
 
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        // Стопка снова главная на экране: страхуемся от следов прерванного перехода.
+
         resetNeighbours()
     }
 
@@ -78,8 +69,6 @@ public final class CDKWalletViewController: UIViewController {
         super.viewDidLayoutSubviews()
         stackLayout.headerHeight = headerView.bounds.height
     }
-
-    // MARK: - Настройка
 
     private func setUpCollectionView() {
         collectionView.backgroundColor = .clear
@@ -154,7 +143,6 @@ public final class CDKWalletViewController: UIViewController {
         }
     }
 
-    /// Показывает тост отмены; по истечении окна удаление становится необратимым.
     private func presentUndoToast() {
         undoToast?.dismiss(undo: false)
         let toast = CDKUndoToastView()
@@ -182,37 +170,30 @@ public final class CDKWalletViewController: UIViewController {
         )
     }
 
-    /// Подпись счётчика карт.
     private static func cardsWord(_ count: Int) -> String {
         count == 1 ? "card" : "cards"
     }
 
-    /// Ячейка карты по идентификатору — нужна переходу и действиям доступности.
     func cell(for card: CDKCardSnapshot) -> CDKCardCell? {
         guard let indexPath = dataSource?.indexPath(for: card) else { return nil }
         return collectionView.cellForItem(at: indexPath) as? CDKCardCell
     }
 
-    /// Карта по ячейке.
     func card(for cell: CDKCardCell) -> CDKCardSnapshot? {
         guard let indexPath = collectionView.indexPath(for: cell) else { return nil }
         return dataSource?.itemIdentifier(for: indexPath)
     }
 
-    /// Открывает карту, сообщая координатору исходную ячейку для перехода.
     func open(_ card: CDKCardSnapshot, from cell: CDKCardCell) {
         viewModel.markUsed(id: card.id)
         haptics.playSnap()
         delegate?.walletViewController(self, didSelect: card, from: cell)
     }
 
-    /// Доступ к вью-модели для расширений экрана.
     var model: CDKWalletViewModel { viewModel }
-    /// Доступ к тактильной отдаче для расширений экрана.
+
     var hapticsService: CDKHapticsServiceProtocol { haptics }
 }
-
-// MARK: - UICollectionViewDelegate
 
 extension CDKWalletViewController: UICollectionViewDelegate {
 
@@ -225,8 +206,6 @@ extension CDKWalletViewController: UICollectionViewDelegate {
         open(card, from: cell)
     }
 }
-
-// MARK: - CDKCardCellDelegate
 
 extension CDKWalletViewController: CDKCardCellDelegate {
 

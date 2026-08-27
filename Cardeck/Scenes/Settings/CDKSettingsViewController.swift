@@ -1,28 +1,16 @@
-//
-//  CDKSettingsViewController.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// События экрана настроек.
 public protocol CDKSettingsViewControllerDelegate: AnyObject {
-    /// Данные сброшены — стопке нужно перечитать себя.
+
     func settingsDidResetData(_ controller: CDKSettingsViewController)
-    /// Настройка материала изменилась — карты надо пересобрать.
+
     func settingsDidChangeAppearance(_ controller: CDKSettingsViewController)
-    /// Любая настройка изменилась — стопке нужно перечитать себя.
-    ///
-    /// Экран открывается листом поверх стопки, и `viewWillAppear` у неё
-    /// при закрытии не вызывается: без этого уведомления смена порядка
-    /// сортировки не доезжала бы до экрана.
+
     func settingsDidChange(_ controller: CDKSettingsViewController)
 }
 
-/// Экран настроек: секции-карточки вместо системного списка.
 public final class CDKSettingsViewController: UIViewController {
 
-    /// Приёмник событий экрана.
     public weak var delegate: CDKSettingsViewControllerDelegate?
 
     private let viewModel: CDKSettingsViewModel
@@ -35,7 +23,6 @@ public final class CDKSettingsViewController: UIViewController {
     private var sortRows: [CDKSortOrder: CDKSettingsChoiceRow] = [:]
     private var toggleRows: [CDKSettingsToggleRow] = []
 
-    /// Создаёт экран настроек.
     public init(viewModel: CDKSettingsViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -59,8 +46,6 @@ public final class CDKSettingsViewController: UIViewController {
         }
         refresh()
     }
-
-    // MARK: - Секции
 
     private func makeSortSection() -> UIView {
         let section = CDKSettingsSectionView(title: "Stack order")
@@ -120,10 +105,6 @@ public final class CDKSettingsViewController: UIViewController {
         return section
     }
 
-    // MARK: - Сброс
-
-    /// Сброс подтверждается в два шага: первое подтверждение объясняет
-    /// последствия, второе требует осознанного повторного нажатия.
     private func confirmReset() {
         let first = UIAlertController(
             title: "Reset all data?",
@@ -152,8 +133,6 @@ public final class CDKSettingsViewController: UIViewController {
         present(second, animated: true)
     }
 
-    // MARK: - Вёрстка
-
     private func refresh() {
         for (order, row) in sortRows {
             row.setSelected(order == viewModel.sortOrder)
@@ -168,7 +147,6 @@ public final class CDKSettingsViewController: UIViewController {
         headerLabel.text = "Settings"
         headerLabel.font = CDKTheme.Font.title
         headerLabel.textColor = CDKTheme.Color.textPrimary
-        headerLabel.adjustsFontForContentSizeCategory = true
         headerLabel.accessibilityTraits = .header
 
         var configuration = UIButton.Configuration.plain()
@@ -184,7 +162,6 @@ public final class CDKSettingsViewController: UIViewController {
         versionLabel.font = CDKTheme.Font.caption
         versionLabel.textColor = CDKTheme.Color.textSecondary
         versionLabel.textAlignment = .center
-        versionLabel.adjustsFontForContentSizeCategory = true
 
         contentStack.axis = .vertical
         contentStack.spacing = CDKTheme.Spacing.l

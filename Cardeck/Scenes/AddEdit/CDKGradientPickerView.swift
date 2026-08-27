@@ -1,17 +1,7 @@
-//
-//  CDKGradientPickerView.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Горизонтальный выбор градиента карты: восемь кружков со snapping.
-///
-/// При защёлкивании кружка играет тактильный отклик выбора — так пикер
-/// ощущается как физический барабан, а не как список.
 public final class CDKGradientPickerView: UIView {
 
-    /// Выбран новый градиент.
     public var onSelect: ((Int) -> Void)?
 
     private let haptics: CDKHapticsServiceProtocol
@@ -19,10 +9,8 @@ public final class CDKGradientPickerView: UIView {
     private let scrollView = UIScrollView()
     private var swatches: [CDKGradientSwatch] = []
 
-    /// Индекс выбранного градиента.
     public private(set) var selectedIndex: Int = 0
 
-    /// Создаёт пикер.
     public init(haptics: CDKHapticsServiceProtocol) {
         self.haptics = haptics
         super.init(frame: .zero)
@@ -32,7 +20,6 @@ public final class CDKGradientPickerView: UIView {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError("init(coder:) не поддерживается") }
 
-    /// Выбирает градиент по индексу без тактильного отклика.
     public func select(index: Int, animated: Bool) {
         selectedIndex = index
         for (position, swatch) in swatches.enumerated() {
@@ -42,7 +29,7 @@ public final class CDKGradientPickerView: UIView {
 
     private func setUp() {
         scrollView.showsHorizontalScrollIndicator = false
-        // Snapping: кружок всегда доезжает до целого положения.
+
         scrollView.decelerationRate = .fast
         stack.axis = .horizontal
         stack.spacing = CDKTheme.Spacing.m
@@ -87,10 +74,8 @@ public final class CDKGradientPickerView: UIView {
     }
 }
 
-/// Один кружок палитры.
 final class CDKGradientSwatch: UIControl {
 
-    /// Диаметр кружка.
     static let side: CGFloat = 44
 
     private let gradientLayer = CAGradientLayer()
@@ -129,7 +114,6 @@ final class CDKGradientSwatch: UIControl {
         CATransaction.commit()
     }
 
-    /// Подсвечивает выбранный кружок кольцом.
     func setSelected(_ selected: Bool, animated: Bool) {
         accessibilityTraits = selected ? [.button, .selected] : .button
         let apply = { self.ring.borderWidth = selected ? 2 : 0 }

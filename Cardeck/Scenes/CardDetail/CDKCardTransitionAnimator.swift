@@ -1,16 +1,5 @@
-//
-//  CDKCardTransitionAnimator.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Анимация перехода карты между стопкой и детальным экраном.
-///
-/// В `containerView` летит настоящая карта: ``CDKCardMaterialView`` переносится
-/// из ячейки (снимок заморозил бы голограмму), а поверх него — те же подписи,
-/// что и в стопке. Без подписей карта на всё время полёта оставалась безымянной,
-/// и название «моргало» в конце перехода.
 final class CDKCardTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
 
     enum Direction { case present, dismiss }
@@ -19,10 +8,8 @@ final class CDKCardTransitionAnimator: NSObject, UIViewControllerAnimatedTransit
     private let card: CDKCardSnapshot
     private weak var wallet: CDKWalletViewController?
 
-    /// Текущий аниматор перехода — интерактивное закрытие ставит его на паузу.
     private(set) var propertyAnimator: UIViewPropertyAnimator?
 
-    /// Вызывается по фактическому завершению перехода в любую сторону.
     var onCompleted: ((UIViewAnimatingPosition) -> Void)?
 
     init(direction: Direction, card: CDKCardSnapshot, wallet: CDKWalletViewController?) {
@@ -56,8 +43,6 @@ final class CDKCardTransitionAnimator: NSObject, UIViewControllerAnimatedTransit
         propertyAnimator = animator
         return animator
     }
-
-    // MARK: - Открытие
 
     private func makePresentAnimator(
         _ context: any UIViewControllerContextTransitioning
@@ -119,8 +104,6 @@ final class CDKCardTransitionAnimator: NSObject, UIViewControllerAnimatedTransit
         return animator
     }
 
-    // MARK: - Закрытие
-
     private func makeDismissAnimator(
         _ context: any UIViewControllerContextTransitioning
     ) -> UIViewPropertyAnimator {
@@ -147,9 +130,6 @@ final class CDKCardTransitionAnimator: NSObject, UIViewControllerAnimatedTransit
         )
         cell.alpha = 0
 
-        // Контент гаснет внутри основного аниматора, а не отдельным: при отмене
-        // жеста UIKit разворачивает именно этот аниматор, и всё, что анимировано
-        // снаружи, осталось бы в погашенном состоянии.
         animator.addAnimations {
             flying.frame = targetFrame
             detail.view.alpha = 0
@@ -186,9 +166,6 @@ final class CDKCardTransitionAnimator: NSObject, UIViewControllerAnimatedTransit
         return animator
     }
 
-    // MARK: - Общее
-
-    /// Собирает карту, которая летит в `containerView`: материал плюс подписи.
     private func makeFlyingCard(
         material: CDKCardMaterialView,
         frame: CGRect,
@@ -213,8 +190,6 @@ final class CDKCardTransitionAnimator: NSObject, UIViewControllerAnimatedTransit
         }
     }
 
-    /// Контент детального экрана появляется вторым аниматором с задержкой:
-    /// карта успевает долететь, и только потом под ней проявляется панель кода.
     private func revealContent(of detail: CDKCardDetailViewController) {
         let animator = CDKTheme.Motion.transition()
         animator.addAnimations {

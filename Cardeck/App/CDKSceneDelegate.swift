@@ -1,11 +1,5 @@
-//
-//  CDKSceneDelegate.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Делегат сцены: поднимает окно и передаёт управление координатору.
 public final class CDKSceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     public var window: UIWindow?
@@ -29,9 +23,6 @@ public final class CDKSceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.coordinator = coordinator
         window.makeKeyAndVisible()
 
-        // Карта, открытая до убийства приложения, возвращается на экран.
-        // Стопка к этому моменту уже наполнена, поэтому ячейка-источник найдётся
-        // и переход отработает штатно.
         let activity = connectionOptions.userActivities.first
             ?? session.stateRestorationActivity
         window.layoutIfNeeded()

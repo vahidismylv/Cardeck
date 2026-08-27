@@ -1,16 +1,6 @@
-//
-//  CDKPrivacyPolicyViewController.swift
-//  Cardeck
-//
-
 import UIKit
 import WebKit
 
-/// Экран политики конфиденциальности.
-///
-/// Приложение не ходит в сеть нигде, кроме этого экрана, поэтому офлайн здесь —
-/// нормальное состояние, а не ошибка: вместо пустой страницы показывается
-/// понятное объяснение и кнопка повтора.
 public final class CDKPrivacyPolicyViewController: UIViewController {
 
     private let webView = WKWebView()
@@ -21,7 +11,6 @@ public final class CDKPrivacyPolicyViewController: UIViewController {
 
     private let url: URL?
 
-    /// Создаёт экран политики.
     public init(url: URL? = URL(string: "https://www.apple.com/legal/privacy/en-ww/")) {
         self.url = url
         super.init(nibName: nil, bundle: nil)
@@ -69,7 +58,6 @@ public final class CDKPrivacyPolicyViewController: UIViewController {
         errorLabel.textColor = CDKTheme.Color.textSecondary
         errorLabel.textAlignment = .center
         errorLabel.numberOfLines = 0
-        errorLabel.adjustsFontForContentSizeCategory = true
         errorLabel.isHidden = true
 
         retryButton.isHidden = true
@@ -117,8 +105,6 @@ public final class CDKPrivacyPolicyViewController: UIViewController {
         ])
     }
 }
-
-// MARK: - WKNavigationDelegate
 
 extension CDKPrivacyPolicyViewController: WKNavigationDelegate {
 

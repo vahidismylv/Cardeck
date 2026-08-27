@@ -1,25 +1,14 @@
-//
-//  CDKAddEditViewController.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// События формы карты.
 public protocol CDKAddEditViewControllerDelegate: AnyObject {
-    /// Карта сохранена.
+
     func addEdit(_ controller: CDKAddEditViewController, didSave card: CDKCardSnapshot)
-    /// Пользователь закрыл форму без сохранения.
+
     func addEditDidCancel(_ controller: CDKAddEditViewController)
 }
 
-/// Форма добавления и редактирования карты.
-///
-/// Один контроллер на оба режима: он отличает их только заголовком, подписью
-/// кнопки и тем, что отдаёт хранилищу — `add` или `update`.
 public final class CDKAddEditViewController: UIViewController {
 
-    /// Приёмник событий формы.
     public weak var delegate: CDKAddEditViewControllerDelegate?
 
     private let viewModel: CDKAddEditViewModel
@@ -27,11 +16,10 @@ public final class CDKAddEditViewController: UIViewController {
     private var material: CDKCardMaterialView?
 
     private var contentView: CDKAddEditView {
-        // swiftlint:disable:next force_cast
+
         view as! CDKAddEditView
     }
 
-    /// Создаёт форму.
     public init(viewModel: CDKAddEditViewModel, haptics: CDKHapticsServiceProtocol) {
         self.viewModel = viewModel
         self.haptics = haptics
@@ -65,9 +53,6 @@ public final class CDKAddEditViewController: UIViewController {
         material?.stopMotionUpdates()
     }
 
-    // MARK: - Приватное
-
-    /// Превью — та же живая карта, что и в стопке, а не статичная картинка.
     private func attachPreviewMaterial() {
         let material = CDKCardMaterialView(gradient: viewModel.draft.gradient)
         contentView.previewCard.attach(material)
@@ -119,7 +104,6 @@ public final class CDKAddEditViewController: UIViewController {
         }
     }
 
-    /// Сообщает о неудачной записи — чаще всего это переполненный диск.
     private func presentSaveFailure() {
         let alert = UIAlertController(
             title: "Could not save",
@@ -130,7 +114,6 @@ public final class CDKAddEditViewController: UIViewController {
         present(alert, animated: true)
     }
 
-    /// Превью уезжает вверх и уменьшается, пока поднята клавиатура.
     private func observeKeyboard() {
         NotificationCenter.default.addObserver(
             forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main

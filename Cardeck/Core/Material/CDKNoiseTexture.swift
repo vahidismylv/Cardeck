@@ -1,25 +1,10 @@
-//
-//  CDKNoiseTexture.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Фабрика зернистой текстуры для fallback-материала.
-///
-/// Скругление углов запекается прямо в альфу изображения: слою не нужен
-/// `masksToBounds`, а значит карта не уходит в offscreen-проход.
 public enum CDKNoiseTexture {
 
     private static let cache = NSCache<NSString, UIImage>()
     private static let tileSide = 128
 
-    /// Зерно заданного размера со скруглёнными углами.
-    ///
-    /// - Parameters:
-    ///   - size: размер в точках.
-    ///   - cornerRadius: радиус скругления в точках.
-    ///   - amplitude: непрозрачность зерна, 0...1.
     public static func image(
         size: CGSize,
         cornerRadius: CGFloat,
@@ -43,11 +28,9 @@ public enum CDKNoiseTexture {
         return image
     }
 
-    /// Небольшой тайл случайного серого шума; на амплитуде 0.04 повтор не читается.
     private static func grainTile() -> CGImage? {
         let side = tileSide
-        // Буфер выделяет сам CGContext: изображение может держать на него ссылку,
-        // поэтому локальный массив здесь использовать нельзя.
+
         guard let context = CGContext(
             data: nil,
             width: side,

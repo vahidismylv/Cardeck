@@ -1,25 +1,13 @@
-//
-//  CDKSwiftDataCardStore.swift
-//  Cardeck
-//
-
 import Foundation
 import SwiftData
 
-/// Постоянное хранилище карт на SwiftData.
-///
-/// Чтение идёт через главный контекст контейнера, запись — через отдельный:
-/// так изменения не смешиваются с тем, что сейчас показано на экране,
-/// а `reorder` целиком укладывается в одну транзакцию.
 public final class CDKSwiftDataCardStore: CDKCardStore {
 
     private let container: ModelContainer
     private let writeContext: ModelContext
 
-    /// Данные не переживут перезапуск: диск оказался недоступен.
     public let isEphemeral: Bool
 
-    /// Создаёт хранилище поверх контейнера.
     public init(result: CDKModelContainerFactory.Result) {
         self.container = result.container
         self.isEphemeral = result.isEphemeral
@@ -29,8 +17,6 @@ public final class CDKSwiftDataCardStore: CDKCardStore {
 
     private var readContext: ModelContext { container.mainContext }
 
-    // MARK: - Чтение
-
     public func fetchAll(sortedBy order: CDKSortOrder) throws -> [CDKCardSnapshot] {
         let descriptor = FetchDescriptor<CDKCard>(
             sortBy: [SortDescriptor(\.sortIndex, order: .forward)]
@@ -39,12 +25,9 @@ public final class CDKSwiftDataCardStore: CDKCardStore {
         return CDKCardSorting.apply(order, to: cards)
     }
 
-    /// Количество карт в хранилище — нужно, чтобы решить, засеивать ли демо-набор.
     public func count() throws -> Int {
         try readContext.fetchCount(FetchDescriptor<CDKCard>())
     }
-
-    // MARK: - Запись
 
     public func add(_ card: CDKCardSnapshot) throws {
         let next = try nextSortIndex()
@@ -71,7 +54,7 @@ public final class CDKSwiftDataCardStore: CDKCardStore {
 
     public func restore(_ card: CDKCardSnapshot) throws {
         guard try model(for: card.id, in: writeContext) == nil else { return }
-        // Возвращаем карту с её исходным `sortIndex`, чтобы она встала на своё место.
+
         writeContext.insert(makeModel(from: card))
         try commit()
     }
@@ -85,7 +68,7 @@ public final class CDKSwiftDataCardStore: CDKCardStore {
               destination >= 0, destination < models.count else { return }
         let moved = models.remove(at: source)
         models.insert(moved, at: destination)
-        // Индексы пересчитываются пачкой и сохраняются одним коммитом.
+
         for (index, model) in models.enumerated() where model.sortIndex != index {
             model.sortIndex = index
         }
@@ -98,13 +81,11 @@ public final class CDKSwiftDataCardStore: CDKCardStore {
         try commit()
     }
 
-    /// Удаляет все карты — сброс данных из настроек.
     public func deleteAll() throws {
         try writeContext.delete(model: CDKCard.self)
         try commit()
     }
 
-    /// Вставляет набор карт одной транзакцией — засев демо-данных.
     public func insert(_ cards: [CDKCardSnapshot]) throws {
         for card in cards {
             writeContext.insert(makeModel(from: card))
@@ -112,15 +93,12 @@ public final class CDKSwiftDataCardStore: CDKCardStore {
         try commit()
     }
 
-    // MARK: - Приватное
-
     private func commit() throws {
         guard writeContext.hasChanges else { return }
         do {
             try writeContext.save()
         } catch {
-            // Чаще всего это переполненный диск. Откатываем несохранённое,
-            // чтобы контекст не остался в противоречивом состоянии.
+
             writeContext.rollback()
             throw error
         }

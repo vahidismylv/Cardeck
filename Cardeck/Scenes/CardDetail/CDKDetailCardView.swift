@@ -1,25 +1,15 @@
-//
-//  CDKDetailCardView.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Карта на детальном экране: слот для материала плюс подписи.
-///
-/// Материал сюда не создаётся, а приезжает из ячейки стопки на время перехода
-/// и остаётся здесь до закрытия экрана. Пока слот пуст, вью прозрачна —
-/// в этот момент материал живёт в `containerView` перехода.
 public final class CDKDetailCardView: UIView {
 
     private let titleLabel = UILabel()
     private let categoryLabel = UILabel()
     private let codeLabel = UILabel()
 
-    /// Установленный материал карты, если он сейчас здесь.
     public private(set) var materialView: CDKCardMaterialView?
 
-    /// Радиус скругления карты. Меняется на время перехода из стопки.
+    private var snapshot: CDKCardSnapshot?
+
     public var cornerRadius: CGFloat = CDKTheme.Radius.cardExpanded {
         didSet {
             guard cornerRadius != oldValue else { return }
@@ -41,9 +31,14 @@ public final class CDKDetailCardView: UIView {
         layer.cdkApplyCardShadow(cornerRadius: cornerRadius)
     }
 
-    /// Наполняет подписи данными карты.
+    @objc private func handleContrastChange() {
+        guard let snapshot else { return }
+        configure(with: snapshot)
+    }
+
     public func configure(with card: CDKCardSnapshot) {
-        let foreground = card.gradient.end.cdkReadableForeground
+        snapshot = card
+        let foreground = card.gradient.foregroundColor
         titleLabel.text = card.title
         titleLabel.textColor = foreground
         categoryLabel.text = card.category.title
@@ -53,7 +48,6 @@ public final class CDKDetailCardView: UIView {
         isAccessibilityElement = false
     }
 
-    /// Ставит материал в слот и растягивает его по карте.
     public func attach(_ material: CDKCardMaterialView) {
         materialView = material
         material.cornerRadius = cornerRadius
@@ -63,7 +57,6 @@ public final class CDKDetailCardView: UIView {
         material.startMotionUpdates()
     }
 
-    /// Забирает материал из слота — например, для анимации закрытия.
     public func detachMaterial() -> CDKCardMaterialView? {
         guard let materialView else { return nil }
         materialView.removeFromSuperview()
@@ -71,7 +64,6 @@ public final class CDKDetailCardView: UIView {
         return materialView
     }
 
-    /// Скрывает подписи, пока карта летит в переходе.
     public func setLabelsVisible(_ visible: Bool) {
         let alpha: CGFloat = visible ? 1 : 0
         titleLabel.alpha = alpha
@@ -81,17 +73,20 @@ public final class CDKDetailCardView: UIView {
 
     private func setUp() {
         backgroundColor = .clear
-        // Типографика совпадает с ячейкой стопки: лицо карты не должно
-        // перевёрстываться при открытии, иначе подписи прыгают в момент передачи.
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleContrastChange),
+            name: UIAccessibility.darkerSystemColorsStatusDidChangeNotification,
+            object: nil
+        )
+
         titleLabel.font = CDKTheme.Font.title
-        titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.numberOfLines = 2
 
         categoryLabel.font = CDKTheme.Font.caption
-        categoryLabel.adjustsFontForContentSizeCategory = true
 
         codeLabel.font = CDKTheme.Font.mono(15)
-        codeLabel.adjustsFontForContentSizeCategory = true
 
         cdkAddSubview(titleLabel)
         cdkAddSubview(categoryLabel)

@@ -1,14 +1,5 @@
-//
-//  CDKFullScreenCodeView.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Код во весь экран на белом фоне — состояние «поднести к сканеру».
-///
-/// Белая подложка здесь не украшение: тёмная тема приложения снижает контраст
-/// кода, а сканеры рассчитывают на светлый фон. Закрывается тапом.
 public final class CDKFullScreenCodeView: UIView {
 
     private let imageView = UIImageView()
@@ -16,7 +7,6 @@ public final class CDKFullScreenCodeView: UIView {
     private let hintLabel = UILabel()
     private let aspectRatio: CGFloat
 
-    /// Создаёт оверлей для номера и пропорций кода.
     public init(number: String, aspectRatio: CGFloat) {
         self.aspectRatio = aspectRatio
         super.init(frame: .zero)
@@ -32,13 +22,11 @@ public final class CDKFullScreenCodeView: UIView {
         numberLabel.textColor = .black
         numberLabel.textAlignment = .center
         numberLabel.numberOfLines = 0
-        numberLabel.adjustsFontForContentSizeCategory = true
 
         hintLabel.text = "Tap to close"
         hintLabel.font = CDKTheme.Font.caption
         hintLabel.textColor = .darkGray
         hintLabel.textAlignment = .center
-        hintLabel.adjustsFontForContentSizeCategory = true
 
         cdkAddSubview(imageView)
         cdkAddSubview(numberLabel)
@@ -73,7 +61,6 @@ public final class CDKFullScreenCodeView: UIView {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError("init(coder:) не поддерживается") }
 
-    /// Показывает оверлей поверх экрана.
     public func present(over host: UIView, image: UIImage?) {
         imageView.image = image
         imageView.isHidden = image == nil

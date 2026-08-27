@@ -1,23 +1,7 @@
-//
-//  CDKCardStackGeometry.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Чистая геометрия стопки карт.
-///
-/// Вынесена из ``CDKCardStackLayout`` отдельно: это функции без состояния,
-/// их удобно проверять юнит-тестами, не поднимая `UICollectionView`.
 public nonisolated enum CDKCardStackGeometry {
 
-    /// Размер карты для заданного размера коллекции.
-    ///
-    /// Обычно ширину задаёт экран. Если карта, посчитанная от ширины, не влезает
-    /// по высоте (узкий экран, крупный заголовок), размер задаёт доступная высота,
-    /// а карта центрируется по горизонтали.
-    ///
-    /// - Returns: размер карты с соотношением ``CDKTheme/Card/aspectRatio``.
     public static func cardSize(
         in bounds: CGSize,
         horizontalInset: CGFloat,
@@ -31,27 +15,10 @@ public nonisolated enum CDKCardStackGeometry {
         return CGSize(width: width, height: CDKTheme.Card.height(forWidth: width))
     }
 
-
-    /// Насколько карта уезжает вниз, освобождая место открывающейся карте.
-    ///
-    /// - Parameter step: расстояние в позициях от открываемой карты, начиная с 1.
     public static func revealShift(step: Int) -> CGFloat {
         120 + CGFloat(max(step - 1, 0)) * 20
     }
 
-    /// Расстояние от линии прижатия до верха прижатой карты.
-    ///
-    /// Шаг между прижатыми картами непрерывно падает с `step` до `pinnedStep`
-    /// на первой ступени (easeOut), дальше остаётся постоянным и перестаёт расти
-    /// после `limit` карт. В точке `progress == 0` функция и её производная совпадают
-    /// с обычной стопкой, поэтому на границе прижатия карты не дёргаются.
-    ///
-    /// - Parameters:
-    ///   - progress: сколько базовых шагов карта прошла выше линии прижатия.
-    ///   - step: базовый шаг стопки.
-    ///   - pinnedStep: минимальный шаг между прижатыми картами.
-    ///   - limit: максимум прижатых карт.
-    /// - Returns: смещение вверх от линии прижатия в точках, всегда неотрицательное.
     public static func displacement(
         progress: CGFloat,
         step: CGFloat,

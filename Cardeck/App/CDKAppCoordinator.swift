@@ -1,14 +1,5 @@
-//
-//  CDKAppCoordinator.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Корневой координатор приложения.
-///
-/// Собирает зависимости и владеет навигацией. Экраны не создают друг друга
-/// и не знают, что открывается следом.
 public final class CDKAppCoordinator {
 
     private let window: UIWindow
@@ -18,16 +9,14 @@ public final class CDKAppCoordinator {
     private let barcodeService: CDKBarcodeServicing
     private let brightnessService: CDKBrightnessServicing
 
-    /// Хранилище на SwiftData, если координатор создал его сам.
     private let persistentStore: CDKSwiftDataCardStore?
 
     private var walletViewController: CDKWalletViewController?
-    /// Контроллер перехода живёт столько же, сколько открытый детальный экран.
+
     private var cardTransition: CDKCardTransitionController?
-    /// Карта, открытая прямо сейчас, — она и попадает в состояние сцены.
+
     private var openCardID: UUID?
 
-    /// Создаёт координатор для окна сцены.
     public init(
         window: UIWindow,
         preferences: CDKPreferencesProtocol = CDKPreferences.shared,
@@ -47,10 +36,6 @@ public final class CDKAppCoordinator {
         self.brightnessService = brightnessService
     }
 
-    /// Засевает демонстрационный набор при первом запуске.
-    ///
-    /// Совсем пустое приложение на первом запуске выглядит сломанным, а пустое
-    /// состояние всё равно достижимо через сброс данных в настройках.
     private func seedDemoDataIfNeeded() {
         guard let persistentStore, !preferences.didSeedDemoData else { return }
         preferences.didSeedDemoData = true
@@ -58,7 +43,6 @@ public final class CDKAppCoordinator {
         try? persistentStore.insert(CDKMockData.cards)
     }
 
-    /// Открывает форму добавления или редактирования карты.
     private func presentForm(mode: CDKAddEditViewModel.Mode, from presenter: UIViewController) {
         let viewModel = CDKAddEditViewModel(mode: mode, store: store)
         let form = CDKAddEditViewController(viewModel: viewModel, haptics: haptics)
@@ -66,12 +50,10 @@ public final class CDKAppCoordinator {
         presenter.present(form, animated: true)
     }
 
-    /// Активность для восстановления сцены после убийства приложения.
     public var restorationActivity: NSUserActivity? {
         openCardID.map(CDKUserActivity.openCard)
     }
 
-    /// Восстанавливает открытую карту, если она ещё существует.
     public func restore(from activity: NSUserActivity?) {
         guard let id = CDKUserActivity.cardID(from: activity),
               let wallet = walletViewController,
@@ -80,7 +62,6 @@ public final class CDKAppCoordinator {
         wallet.open(card, from: cell)
     }
 
-    /// Показывает стартовый экран.
     public func start() {
         seedDemoDataIfNeeded()
         let viewModel = CDKWalletViewModel(store: store, preferences: preferences)
@@ -90,8 +71,6 @@ public final class CDKAppCoordinator {
         window.rootViewController = wallet
     }
 }
-
-// MARK: - CDKWalletViewControllerDelegate
 
 extension CDKAppCoordinator: CDKWalletViewControllerDelegate {
 
@@ -131,8 +110,6 @@ extension CDKAppCoordinator: CDKWalletViewControllerDelegate {
     }
 }
 
-// MARK: - CDKCardDetailViewControllerDelegate
-
 extension CDKAppCoordinator: CDKCardDetailViewControllerDelegate {
 
     public func cardDetailDidRequestEdit(_ controller: CDKCardDetailViewController) {
@@ -158,8 +135,6 @@ extension CDKAppCoordinator: CDKCardDetailViewControllerDelegate {
     }
 }
 
-// MARK: - CDKAddEditViewControllerDelegate
-
 extension CDKAppCoordinator: CDKAddEditViewControllerDelegate {
 
     public func addEdit(_ controller: CDKAddEditViewController, didSave card: CDKCardSnapshot) {
@@ -173,12 +148,10 @@ extension CDKAppCoordinator: CDKAddEditViewControllerDelegate {
     }
 }
 
-// MARK: - CDKSettingsViewControllerDelegate
-
 extension CDKAppCoordinator: CDKSettingsViewControllerDelegate {
 
     public func settingsDidResetData(_ controller: CDKSettingsViewController) {
-        // Пустое состояние появляется сразу, без перезапуска приложения.
+
         walletViewController?.model.reload()
     }
 
@@ -187,7 +160,7 @@ extension CDKAppCoordinator: CDKSettingsViewControllerDelegate {
     }
 
     public func settingsDidChangeAppearance(_ controller: CDKSettingsViewController) {
-        // Материал выбирается при создании ячейки, поэтому карты надо пересобрать.
+
         walletViewController?.rebuildCards()
     }
 }

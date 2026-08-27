@@ -1,17 +1,7 @@
-//
-//  CDKGradientPalette.swift
-//  Cardeck
-//
-
 import UIKit
 
-/// Палитра из восьми диагональных градиентов для карт.
-///
-/// Каждый пресет — два насыщенных стопа. Индекс пресета хранится в модели карты,
-/// поэтому порядок элементов менять нельзя: он часть формата данных.
-public enum CDKGradientPalette {
+public nonisolated enum CDKGradientPalette {
 
-    /// Все пресеты палитры в порядке хранения.
     public static let presets: [CDKGradientPreset] = [
         CDKGradientPreset(name: "Midnight", start: 0x1B2A6B, end: 0x6B2FB3),
         CDKGradientPreset(name: "Emerald", start: 0x0B6B4F, end: 0x1FC8B4),
@@ -23,41 +13,38 @@ public enum CDKGradientPalette {
         CDKGradientPreset(name: "Gold", start: 0xD9A521, end: 0x8A4B18)
     ]
 
-    /// Количество пресетов.
     public static var count: Int { presets.count }
 
-    /// Пресет по индексу; индекс приводится к диапазону палитры.
     public static func preset(at index: Int) -> CDKGradientPreset {
         presets[((index % count) + count) % count]
     }
 }
 
-/// Один градиентный пресет карты: имя для доступности и два цветовых стопа.
-public struct CDKGradientPreset: Equatable {
+public nonisolated struct CDKGradientPreset: Equatable, Sendable {
 
-    /// Человекочитаемое имя пресета, читается VoiceOver в пикере.
     public let name: String
-    /// Начальный цвет диагонали (верхний левый угол).
+
     public let start: UIColor
-    /// Конечный цвет диагонали (нижний правый угол).
+
     public let end: UIColor
 
-    /// Создаёт пресет из двух шестнадцатеричных значений RGB.
     public init(name: String, start: UInt32, end: UInt32) {
         self.name = name
         self.start = UIColor(cdkHex: start)
         self.end = UIColor(cdkHex: end)
     }
 
-    /// Плоский цвет для режима Increase Contrast, где градиенты запрещены.
     public var flatColor: UIColor {
         start.cdkBlended(with: end, fraction: 0.5).cdkDarkened(by: 0.12)
     }
 
-    /// Стопы в виде `CGColor` для `CAGradientLayer`.
+    @MainActor public var foregroundColor: UIColor {
+        let background = UIAccessibility.isDarkerSystemColorsEnabled ? flatColor : end
+        return background.cdkReadableForeground
+    }
+
     public var cgColors: [CGColor] { [start.cgColor, end.cgColor] }
 
-    /// Стопы в виде линейных компонент RGBA для передачи в шейдер.
     public var shaderColors: (start: SIMD4<Float>, end: SIMD4<Float>) {
         (start.cdkFloat4, end.cdkFloat4)
     }
