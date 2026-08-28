@@ -16,6 +16,7 @@ public final class CDKAppCoordinator {
     private var cardTransition: CDKCardTransitionController?
 
     private var openCardID: UUID?
+    private var launchView: CDKLaunchView?
 
     public init(
         window: UIWindow,
@@ -69,6 +70,20 @@ public final class CDKAppCoordinator {
         wallet.delegate = self
         walletViewController = wallet
         window.rootViewController = wallet
+    }
+
+    public func showLaunchOverlay() {
+        let launch = CDKLaunchView()
+        window.cdkAddSubview(launch)
+        launch.cdkPin(to: window)
+        window.layoutIfNeeded()
+        launch.start()
+        launchView = launch
+
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .milliseconds(1100))
+            self?.launchView?.finish { [weak self] in self?.launchView = nil }
+        }
     }
 }
 

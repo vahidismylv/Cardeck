@@ -22,6 +22,7 @@ public final class CDKSceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = window
         self.coordinator = coordinator
         window.makeKeyAndVisible()
+        coordinator.showLaunchOverlay()
 
         let activity = connectionOptions.userActivities.first
             ?? session.stateRestorationActivity

@@ -1,6 +1,6 @@
 import UIKit
 
-public final class CDKFormFieldView: UIView {
+public final class CDKFormFieldView: UIView, UITextFieldDelegate {
 
     public var onChange: ((String) -> Void)?
 
@@ -56,6 +56,9 @@ public final class CDKFormFieldView: UIView {
         textField.textColor = CDKTheme.Color.textPrimary
         textField.keyboardType = keyboard
         textField.autocorrectionType = .no
+        textField.returnKeyType = .done
+        textField.enablesReturnKeyAutomatically = false
+        textField.delegate = self
         textField.attributedPlaceholder = NSAttributedString(
             string: placeholder,
             attributes: [.foregroundColor: CDKTheme.Color.textSecondary]
@@ -123,5 +126,10 @@ public final class CDKFormFieldView: UIView {
 
     @objc private func editingChanged() {
         onChange?(text)
+    }
+
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }

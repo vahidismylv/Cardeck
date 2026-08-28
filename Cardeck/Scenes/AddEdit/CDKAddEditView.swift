@@ -170,7 +170,7 @@ public final class CDKAddEditView: UIView {
 
         NSLayoutConstraint.activate([
             headerLabel.topAnchor.constraint(
-                equalTo: safeAreaLayoutGuide.topAnchor, constant: CDKTheme.Spacing.s
+                equalTo: safeAreaLayoutGuide.topAnchor, constant: CDKTheme.Spacing.l
             ),
             headerLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: inset),
             cancelButton.centerYAnchor.constraint(equalTo: headerLabel.centerYAnchor),

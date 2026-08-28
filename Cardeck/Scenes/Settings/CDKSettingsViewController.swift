@@ -175,7 +175,7 @@ public final class CDKSettingsViewController: UIViewController {
         let inset = CDKTheme.Card.detailHorizontalInset
         NSLayoutConstraint.activate([
             headerLabel.topAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CDKTheme.Spacing.s
+                equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CDKTheme.Spacing.l
             ),
             headerLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: inset),
             closeButton.centerYAnchor.constraint(equalTo: headerLabel.centerYAnchor),

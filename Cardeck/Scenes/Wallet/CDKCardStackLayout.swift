@@ -40,7 +40,6 @@ public final class CDKCardStackLayout: UICollectionViewLayout {
     private var pileHeight: CGFloat {
         CDKCardStackGeometry.displacement(
             progress: CGFloat(CDKTheme.Card.maxPinnedCards),
-            step: step,
             pinnedStep: pinnedStep,
             limit: CGFloat(CDKTheme.Card.maxPinnedCards)
         )
@@ -173,7 +172,6 @@ public final class CDKCardStackLayout: UICollectionViewLayout {
 
             attributes.frame.origin.y = pinLine - CDKCardStackGeometry.displacement(
                 progress: progress,
-                step: step,
                 pinnedStep: pinnedStep,
                 limit: maxPinned
             )

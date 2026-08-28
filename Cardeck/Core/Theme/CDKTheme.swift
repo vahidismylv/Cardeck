@@ -84,11 +84,11 @@ public enum CDKTheme {
 
         public static let stackStep: CGFloat = 62
 
-        public static let pinnedStep: CGFloat = 14
+        public static let pinnedStep: CGFloat = 12
 
-        public static let maxPinnedCards: Int = 4
+        public static let maxPinnedCards: Int = 3
 
-        public static let pinInset: CGFloat = 12
+        public static let pinInset: CGFloat = 8
 
         public static let perspective: CGFloat = -1.0 / 700.0
 

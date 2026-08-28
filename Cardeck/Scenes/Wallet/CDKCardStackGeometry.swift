@@ -21,18 +21,10 @@ public nonisolated enum CDKCardStackGeometry {
 
     public static func displacement(
         progress: CGFloat,
-        step: CGFloat,
         pinnedStep: CGFloat,
         limit: CGFloat
     ) -> CGFloat {
         guard progress > 0 else { return 0 }
-        let amplitude = step - pinnedStep
-        let clamped = min(progress, limit)
-        if clamped <= 1 {
-            let eased = 1 - pow(1 - clamped, 3)
-            return pinnedStep * clamped + amplitude / 3 * eased
-        }
-        let firstStep = pinnedStep + amplitude / 3
-        return firstStep + pinnedStep * (clamped - 1)
+        return pinnedStep * min(progress, limit)
     }
 }
