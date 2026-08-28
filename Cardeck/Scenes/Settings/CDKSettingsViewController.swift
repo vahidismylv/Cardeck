@@ -18,7 +18,6 @@ public final class CDKSettingsViewController: UIViewController {
     private let contentStack = UIStackView()
     private let headerLabel = UILabel()
     private let closeButton = UIButton(type: .system)
-    private let versionLabel = UILabel()
 
     private var sortRows: [CDKSortOrder: CDKSettingsChoiceRow] = [:]
     private var toggleRows: [CDKSettingsToggleRow] = []
@@ -38,7 +37,6 @@ public final class CDKSettingsViewController: UIViewController {
         contentStack.addArrangedSubview(makeSortSection())
         contentStack.addArrangedSubview(makeBehaviourSection())
         contentStack.addArrangedSubview(makeDataSection())
-        contentStack.addArrangedSubview(versionLabel)
         viewModel.onChange = { [weak self] in
             guard let self else { return }
             self.refresh()
@@ -90,17 +88,11 @@ public final class CDKSettingsViewController: UIViewController {
     private func makeDataSection() -> UIView {
         let section = CDKSettingsSectionView(title: "Data")
 
-        let privacy = CDKSettingsActionRow(title: "Privacy Policy")
-        privacy.onTap = { [weak self] in
-            self?.present(CDKPrivacyPolicyViewController(), animated: true)
-        }
-
         let reset = CDKSettingsActionRow(
             title: "Reset all data", destructive: true, showsChevron: false
         )
         reset.onTap = { [weak self] in self?.confirmReset() }
 
-        section.addRow(privacy)
         section.addRow(reset)
         return section
     }
@@ -140,7 +132,6 @@ public final class CDKSettingsViewController: UIViewController {
         toggleRows[0].setOn(viewModel.hapticsEnabled)
         toggleRows[1].setOn(viewModel.autoBrightnessEnabled)
         toggleRows[2].setOn(viewModel.holographicEnabled)
-        versionLabel.text = viewModel.versionText
     }
 
     private func setUpChrome() {
@@ -158,10 +149,6 @@ public final class CDKSettingsViewController: UIViewController {
             UIAction { [weak self] _ in self?.dismiss(animated: true) },
             for: .touchUpInside
         )
-
-        versionLabel.font = CDKTheme.Font.caption
-        versionLabel.textColor = CDKTheme.Color.textSecondary
-        versionLabel.textAlignment = .center
 
         contentStack.axis = .vertical
         contentStack.spacing = CDKTheme.Spacing.l

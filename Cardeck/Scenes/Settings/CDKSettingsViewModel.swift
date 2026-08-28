@@ -46,13 +46,6 @@ public final class CDKSettingsViewModel {
         }
     }
 
-    public var versionText: String {
-        let bundle = Bundle.main
-        let version = bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString")
-        let build = bundle.object(forInfoDictionaryKey: "CFBundleVersion")
-        return "Version \(version as? String ?? "—") (\(build as? String ?? "—"))"
-    }
-
     public func resetData() {
         try? store.deleteAll()
         onReset?()
