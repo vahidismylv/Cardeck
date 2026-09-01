@@ -33,7 +33,7 @@ public enum CDKModelContainerFactory {
             return Result(container: container, isEphemeral: true)
         }
 
-        fatalError("Не удалось создать ModelContainer ни на диске, ни в памяти")
+        fatalError("Failed to create a ModelContainer on disk or in memory")
     }
 
     private static func makeContainer(

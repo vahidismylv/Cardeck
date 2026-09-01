@@ -18,7 +18,7 @@ public final class CDKGradientPickerView: UIView {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError("init(coder:) не поддерживается") }
+    required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
     public func select(index: Int, animated: Bool) {
         selectedIndex = index
@@ -100,7 +100,7 @@ final class CDKGradientSwatch: UIControl {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError("init(coder:) не поддерживается") }
+    required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
     override func layoutSubviews() {
         super.layoutSubviews()

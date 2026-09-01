@@ -32,7 +32,7 @@ public final class CDKSettingsChoiceRow: UIControl {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError("init(coder:) не поддерживается") }
+    required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
     public func setSelected(_ selected: Bool) {
         checkmark.isHidden = !selected
@@ -81,7 +81,7 @@ public final class CDKSettingsActionRow: UIControl {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError("init(coder:) не поддерживается") }
+    required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
     public override var isHighlighted: Bool {
         didSet {

@@ -20,7 +20,7 @@ public final class CDKFormFieldView: UIView, UITextFieldDelegate {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError("init(coder:) не поддерживается") }
+    required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
     public func setError(_ message: String?) {
         errorLabel.text = message

@@ -42,7 +42,7 @@ public final class CDKWalletViewController: UIViewController {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError("init(coder:) не поддерживается") }
+    required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
     public override func viewDidLoad() {
         super.viewDidLoad()

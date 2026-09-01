@@ -27,7 +27,7 @@ public final class CDKAddEditViewController: UIViewController {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError("init(coder:) не поддерживается") }
+    required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
     public override func loadView() {
         view = CDKAddEditView(haptics: haptics)

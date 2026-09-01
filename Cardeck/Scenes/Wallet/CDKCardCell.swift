@@ -27,7 +27,7 @@ public final class CDKCardCell: UICollectionViewCell {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError("init(coder:) не поддерживается") }
+    required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
     public override func layoutSubviews() {
         super.layoutSubviews()
@@ -85,6 +85,14 @@ public final class CDKCardCell: UICollectionViewCell {
         materialView.removeFromSuperview()
         self.materialView = nil
         return materialView
+    }
+
+    public func reloadMaterial() {
+        guard let snapshot else { return }
+        materialView?.stopMotionUpdates()
+        materialView?.removeFromSuperview()
+        materialView = nil
+        configure(with: snapshot)
     }
 
     public func setLifted(_ lifted: Bool) {

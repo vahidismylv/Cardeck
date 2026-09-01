@@ -59,7 +59,7 @@ public final class CDKFullScreenCodeView: UIView {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError("init(coder:) не поддерживается") }
+    required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
     public func present(over host: UIView, image: UIImage?) {
         imageView.image = image

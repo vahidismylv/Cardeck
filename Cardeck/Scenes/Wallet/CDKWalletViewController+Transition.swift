@@ -28,8 +28,7 @@ extension CDKWalletViewController {
 
     func rebuildCards() {
         for cell in collectionView.visibleCells {
-            guard let cardCell = cell as? CDKCardCell else { continue }
-            cardCell.prepareForReuse()
+            (cell as? CDKCardCell)?.reloadMaterial()
         }
         model.reload()
     }
